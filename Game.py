@@ -47,19 +47,6 @@ class Setup:
             self.wep_range = 6
 
     def backpack(self, item):
-        elif len(self.back) == 5:
-            print("No Space for the " + weapon)
-            choice = input("Do you want to remove an item? y/n")
-            if choice == "n":
-                 print("You decided to leave the " + weapon)
-                 weapon = ""
-            elif choice == "y":
-                for x in enumerate(self.back, start=1):
-                    print(str(x[0]) + ". " + x[1])
-                en = input("Type number of item to remove: ")
-                print("You have removed " + str(self.back[en -1]))
-                del self.back[en - 1]
-                self.backpack(weapon)
         self.back.append(item)
         print(item + " has been added to your backpack('b')")
         i = input("Continue? ")
@@ -194,6 +181,19 @@ class Setup:
         elif enter == "n" or enter == "no":
             print("You decided to leave the " + weapon)
             weapon = ""
+        elif len(self.back) == 5:
+            print("No Space for the " + weapon)
+            choice = input("Do you want to remove an item? y/n")
+            if choice == "n":
+                 print("You decided to leave the " + weapon)
+                 weapon = ""
+            elif choice == "y":
+                for x in enumerate(self.back, start=1):
+                    print(str(x[0]) + ". " + x[1])
+                en = input("Type number of item to remove: ")
+                print("You have removed " + str(self.back[int(en) -1]))
+                del self.back[int(en) - 1]
+                self.backpack(weapon)
         
 
         
@@ -493,7 +493,7 @@ class Combat:
                             en1 = input("Attack or Run?('b' for backpack) ")
                     if en1 == "a" or en1 == "attack" or en1 == "Attack":
                         self.char_attack()             
-                elif luck => self.mon_luck:
+                elif luck >= self.mon_luck:
                     print("The monster missed")
                     en = input("Attack or Run?('b' for backpack) ")
                     while en != "Attack" and en != "attack" and en != "a" and en != "Run":
@@ -510,12 +510,12 @@ class Combat:
             if self.mon_life <= 0:
                 self.victory()
             elif self.char_luck <= s.wep_range:
-                self.mon_life -= random.randint(0, random.randint(1, s.wep_dmg)
+                self.mon_life -= random.randint(0, random.randint(1, s.wep_dmg))
                 if self.mon_life <= 0:
                     self.victory()
                 print("You hit your enemy and now his health is " + str(self.mon_life))
                 self.monster_attack()
-            elif self.char_luck => s.wep_range:
+            elif self.char_luck >= s.wep_range:
                 print("You missed.")
                 self.monster_attack()
 
@@ -567,21 +567,21 @@ class Combat:
                 print("You succesfully escaped from the " + m.monster)    
 
                   
-    enter = input("Attack or Run?('b' for backpack) ")
-    while enter != "Attack" and enter != "attack" and enter != "a" and enter != "Run":
-        if enter == "b":
-            s.view_backpack()
-            enter = input("Attack or Run?('b' for backpack) ")
-        elif enter == "Run" or enter == "r":
-            ch.run()
-            m.chmonster()
-    if enter == "a" or enter == "attack" or enter == "Attack" and s.mon_killed < 6:
-        ch = Combat()
-        ch.monster_attack()
-    elif enter == "a" or enter == "attack" or enter == "Attack" and s.mon_killed > 6:
-        m.ch1monsters()
-        ch = Combat()
-        ch.monster_attack()
+enter = input("Attack or Run?('b' for backpack) ")
+while enter != "Attack" and enter != "attack" and enter != "a" and enter != "Run":
+    if enter == "b":
+        s.view_backpack()
+        enter = input("Attack or Run?('b' for backpack) ")
+    elif enter == "Run" or enter == "r":
+        ch.run()
+        m.chmonster()
+if enter == "a" or enter == "attack" or enter == "Attack" and s.mon_killed < 6:
+    ch = Combat()
+    ch.monster_attack()
+elif enter == "a" or enter == "attack" or enter == "Attack" and s.mon_killed > 6:
+    m.ch1monsters()
+    ch = Combat()
+    ch.monster_attack()
 
 
 

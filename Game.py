@@ -1,7 +1,7 @@
 
 
 
-class Setupsdadsd:
+class Setup:
 
     buff = 0
     def __init__(self):

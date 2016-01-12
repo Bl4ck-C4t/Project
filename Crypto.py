@@ -28,4 +28,4 @@ for x in glob.glob("asd.py"):
     f.close()
 
 
-print("File decrypted.")
+print("File encrypted.")

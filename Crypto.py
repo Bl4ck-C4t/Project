@@ -1,5 +1,6 @@
 import glob
-def asci(txt):
+print("Instructions: Place txt files with text in them in the same folder as Crypto.py, hit enter, watch magic in files")
+input()
     enter = txt
     aa = ""
     c = 0
@@ -28,4 +29,4 @@ for x in glob.glob("asd.py"):
     f.close()
 
 
-print("File decrypted.")
+print("File encrypted.")

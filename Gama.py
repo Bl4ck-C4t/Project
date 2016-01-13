@@ -5,9 +5,11 @@ class Setup:
         print("Enter username: ")
         ent = input(self.bash)
         self.bash = ent + "#> "
+        print("Use 'help' to see commands")
         self.cl = ["ls", "run", "mail", "web", "new", "help"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = ["Something..."]
+        self.messages = {"New1":"Hello"}
         
     def ls(self):
         for x in enumerate(self.harddrive, start=1):
@@ -24,13 +26,13 @@ class Setup:
             self.new()
 
         elif self.cl[1] == ent[:3]:
-            try:
-                self.run(ent[4:])
-            except IndexError:
-                print("Wrong syntax: run [program.extension]")
-                
-		elif self.cl[5] == ent:
-			self.help()
+            self.run(ent[4:])
+
+        elif self.cl[5] == ent:
+            self.help()
+
+        elif self.cl[2] == ent[:4]:
+            self.mail(ent[5:])
         
         else:
             self.error()
@@ -45,9 +47,9 @@ class Setup:
         print("Text written.")
 
     def run(self, pr):
-    	if len(pr) < 3:
-    		print("Wrong syntax: run [program.extension]")
-        if pr[len(pr) - 1: len(pr) - 4: -1] == "txt":
+        if len(pr) < 3:
+            print("Wrong syntax: run [program.extension]")
+        elif pr[len(pr) - 1: len(pr) - 4: -1] == "txt":
             c = 0
             for x in self.harddrive:
                 if x == pr:
@@ -56,11 +58,28 @@ class Setup:
                     c += 1
             print("Data of file " + pr)
             print(self.txt[c])
-            
-            
-	def help(self):
-		print("ls - shows files, new - creates files, run - runs flies")
+
+    def help(self):
+        print("ls - list programs, new - make a txt file, run - runs a program, mail - check mail.")
+
+    def mail(self, email):
+        if email == '':
+            for x in enumerate(self.messages, start=1):
+                print(str(x[0]) + ". " + x[1])
+            enter = input("Type a message to view('e' to exit) ")
+            while enter != "e":
+                for x in enumerate(self.messages, start=1):
+                    if x[0] == int(enter):
+                        print("Message: " + self.messages[x[1]])
+                        break
+                for x in enumerate(self.messages, start=1):
+                    print(str(x[0]) + ". " + x[1])
+                enter = input("Type a message to view('e' to exit) ")
+        else:
+            print("Message " + email + ": " + self.messages[email] )
+        
         
 s = Setup()
 while True:
     enter = s.commands(input(s.bash))
+    

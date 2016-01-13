@@ -28,6 +28,9 @@ class Setup:
                 self.run(ent[4:])
             except IndexError:
                 print("Wrong syntax: run [program.extension]")
+                
+		elif self.cl[5] == ent:
+			self.help()
         
         else:
             self.error()
@@ -42,6 +45,8 @@ class Setup:
         print("Text written.")
 
     def run(self, pr):
+    	if len(pr) < 3:
+    		print("Wrong syntax: run [program.extension]")
         if pr[len(pr) - 1: len(pr) - 4: -1] == "txt":
             c = 0
             for x in self.harddrive:
@@ -51,8 +56,11 @@ class Setup:
                     c += 1
             print("Data of file " + pr)
             print(self.txt[c])
+            
+            
+	def help(self):
+		print("ls - shows files, new - creates files, run - runs flies")
         
 s = Setup()
 while True:
     enter = s.commands(input(s.bash))
-    

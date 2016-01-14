@@ -9,7 +9,7 @@ class Setup:
         self.cl = ["ls", "run", "mail", "web", "new", "help"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = ["Something..."]
-        self.messages = {"New1":"Hello"}
+        self.messages = {"Hello":"I am some one offering you job if you accept reply"}
         
     def ls(self):
         for x in enumerate(self.harddrive, start=1):
@@ -66,18 +66,28 @@ class Setup:
         if email == '':
             for x in enumerate(self.messages, start=1):
                 print(str(x[0]) + ". " + x[1])
-            enter = input("Type a message to view('e' to exit) ")
+            enter = input("Type a message to view('e' to exit, 'r [message title]' to reply') ")
             while enter != "e":
-                for x in enumerate(self.messages, start=1):
-                    if x[0] == int(enter):
-                        print("Message: " + self.messages[x[1]])
-                        break
-                for x in enumerate(self.messages, start=1):
-                    print(str(x[0]) + ". " + x[1])
-                enter = input("Type a message to view('e' to exit) ")
+                if enter[0] == "r":
+                    self.reply(enter[2:])
+                else:
+                    for x in enumerate(self.messages, start=1):
+                        if x[0] == int(enter):
+                            print("")
+                            print("Message: " + self.messages[x[1]])
+                            break
+                    for x in enumerate(self.messages, start=1):
+                        print(str(x[0]) + ". " + x[1])
+                enter = input("Type a message to view('e' to exit, 'r [message title]' to reply') ")
         else:
             print("Message " + email + ": " + self.messages[email] )
-        
+
+    def reply(self, mess):
+        if mess == "Hello":
+            print("Reply sent")
+            self.messages['Start working'] = "So you decieded to take the job ok. So first download these two files from the link 'www.h4u.com' use the 'web' command to do it"        
+            print("New message received check mail!")
+            self.mail()
         
 s = Setup()
 while True:

@@ -31,3 +31,48 @@ def i2b(integer):
         fn += "0"
     fn = fn[::-1]
     return str(fn)
+
+def chypher(name, key):
+    filename = name
+    f = open(filename, "r+")
+    info = f.read()
+    f = open(filename, "w")
+    f.truncate()
+    f.write(te(info, key))
+    f.close()
+    print("File crypted.")
+
+def dechypher(name, key):
+    filename = name
+    f = open(filename, "r+")
+    info = f.read()
+    f = open(filename, "w")
+    f.truncate()
+    f.write(td(info, key))
+    f.close()
+    print("File decrypted.")
+
+def te(string, key):
+    enter = string
+    fn = ""
+    for x in enter:
+        y = ord(x) + key
+        y = i2b(y)
+        fn += y
+        fn += "$"
+    return fn
+
+def td(binary, key):
+    enter = binary
+    mes = ""
+    part = ""
+    c = 0
+    while c < len(enter) - 1:
+        while enter[c] != "$":
+            part += enter[c]
+            c += 1
+        mes += chr(int(b2i(part)) - key)
+        c += 1
+        part = ""
+    return mes
+

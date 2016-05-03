@@ -275,13 +275,13 @@ class Setup:
 
     def download(self, files, size, putin):
         ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files) ")
-        while ent != "c":
+         while ent != "c":
+            ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files) ")
             if ent == "i":
                 print("")
                 for x in files:
                     print(x)
-                print("")
-                ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files)")
+                print("")               
             elif ent == "y":
                 if self.used + size > self.space:
                     print("No space to download files, try deleting some things")

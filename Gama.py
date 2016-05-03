@@ -14,7 +14,7 @@ class Setup:
         self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = ["Something..."]
-        self.messages = {"Hello":("I am some one offering you job if you accept reply", "")}
+        self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
         self.files = ["Ncrack", "Port scanner"]
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.comp = "mine"
@@ -22,7 +22,7 @@ class Setup:
         self.used = 30
         self.hard = None
         self.mes = None
-        self.tx = None
+        self.txt = {}
         self.basher = None
         self.generated = False
         self.login = c.login
@@ -93,7 +93,7 @@ class Setup:
             self.error()
         try:
             if self.cl[9:10][0] == ent:
-                
+                s.comp = "mine"
                 print("Disconnected.")
                 if "data.txt" in self.harddrive:
                     print("New message check mail!")
@@ -114,27 +114,23 @@ class Setup:
                 for x in enumerate(self.harddrive, start=1):
                     print(str(x[0]) + "." + " " + x[1])
                 en = input("Select file to download('d' - confirm, 'c' - cancel) ")
+                for x in enumerate(self.harddrive, start=1):
+                    print(str(x[0]) + "." + " " + x[1])
                 fls.append(self.harddrive[int(en) - 1])
                 enter = input("'d' - confirm, 'c' - cancel ")
-                if enter == "d" and self.harddrive[int(en) - 1][-1:-4:-1] == "exe": 
-                    self.download(fls, 30, s.hard)
-                    
-                elif enter == "d" and self.harddrive[int(en) - 1][-1:-4:-1] == "txt" or self.harddrive[int(en) - 1][-1:-5:-1][::-1] == "html":
-                    c = 0
-                    for x in self.harddrive:
-                        if x == self.harddrive[int(en) - 1]:
-                            break
-                        if x[len(x) - 1: len(x) - 4: -1] == "txt":
-                            c += 1
-                    self.tx.append(self.txt[c-1])
-                    if self.harddrive[int(en) - 1][-1:-4:-1] == "txt":
-                        self.used += self.pspace[self.harddrive[int(en) - 1][len(self.harddrive[int(en) - 1]) - 4]]
-                    
-                    self.used += self.pspace[tx]
-                    self.hard.append(self.harddrive[int(en) - 1])
-                    print("File downloaded")
+                if enter == "d" and fls[0][::-1][:3] == "exe":
+                    self.download(fls, 30, s.harddrive)
+                    print("File downloaded!")
+                if fls[0][::-1][:3] == "txt" or fls[0][::-1][:3] == "html":
+                    file = fls[0]
+                    file_txt = self.txt[file]
+                    s.txt[file] = file_txt
+                    s.used += s.pspace[file]
+                    s.harddrive.append(file)
+                    print("File downloaded!")
                 else:
                     print("Download cancelled")
+                        
 
         except IndexError:
             pass
@@ -149,21 +145,15 @@ class Setup:
         if self.used + space <= self.space:
             self.pspace[name] = space
             self.used += space
-            self.txt.append(ent)
+            self.txt[name + ".txt"] = ent
             print("Text written.")
 
     def run(self, pr):
         if len(pr) < 3:
             print("Wrong syntax: run [program.extension]")
         elif pr[len(pr) - 1: len(pr) - 4: -1] == "txt" or pr[-1:-4:-1] == "html":
-            c = 0
-            for x in self.harddrive:
-                if x == pr:
-                    break
-                if x[len(x) - 1: len(x) - 4: -1] == "txt" or x[-1:-4:-1] == "html":
-                    c += 1
             print("Data of file " + pr)
-            print(self.txt[c])
+            print(self.txt[pr])
             
         elif pr in self.harddrive:
             a = ""
@@ -275,7 +265,7 @@ class Setup:
 
     def download(self, files, size, putin):
         ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files) ")
-         while ent != "c":
+        while ent != "c":
             ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files) ")
             if ent == "i":
                 print("")
@@ -519,11 +509,13 @@ class Computers:
 class PC1(Setup):
     def __init__(self):
         self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
-        self.harddrive = ["explorer.txt","users.txt", "data.txt", "dict.txt"]
-        self.mas = {"New":("Hey did you heard about that guy yesterday?", "")}
-        self.txt = ["me, you, him, she, it", "0xDB38A9477910E9334E3B9262C9847032905BC33DA2FF7B6E4F0C30EE503BDFEB77ED552E043FC205A4C44CB652633438", "wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"]
+        self.harddrive = ["explorer.shit","users.txt", "data.txt", "diction.txt"]
+        self.messages = {"New":("Hey did you heard about that guy yesterday?", "")}
+        self.txt = {"users.txt":"me, you, him, she, it", "data.txt":"0xDB38A9477910E9334E3B9262C9847032905BC33DA2FF7B6E4F0C30EE503BDFEB77ED552E043FC205A4C44CB652633438", "diction.txt":"wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"}
         self.bash = "Han_Solo#> "
-
+        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.space = 2048
+        self.used = 30
 class RE4:
 
 

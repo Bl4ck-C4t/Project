@@ -17,7 +17,7 @@ class Setup:
         self.messages = {"Hello":("I am some one offering you job if you accept reply", "")}
         self.files = ["Ncrack", "Port scanner"]
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
-        
+        self.comp = "mine"
         self.space = 2048
         self.used = 30
         self.hard = None
@@ -93,16 +93,8 @@ class Setup:
             self.error()
         try:
             if self.cl[9:10][0] == ent:
-                self.harddrive = self.hard
-                self.messages = self.mes
-                self.txt = self.tx
-                self.bash = self.basher
-                self.hard = None
-                self.mes = None
-                self.tx = None
-                self.basher = None
+                
                 print("Disconnected.")
-                self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect", "del"]
                 if "data.txt" in self.harddrive:
                     print("New message check mail!")
                     self.messages['Good Job'] = ("Well done, you recovered the file next i will need you to decrypt it. Use this website to download the decryptor: 'www.RE4.com' for any problems reply this", "")
@@ -125,7 +117,7 @@ class Setup:
                 fls.append(self.harddrive[int(en) - 1])
                 enter = input("'d' - confirm, 'c' - cancel ")
                 if enter == "d" and self.harddrive[int(en) - 1][-1:-4:-1] == "exe": 
-                    self.download(fls, 30, self.hard)
+                    self.download(fls, 30, s.hard)
                     
                 elif enter == "d" and self.harddrive[int(en) - 1][-1:-4:-1] == "txt" or self.harddrive[int(en) - 1][-1:-5:-1][::-1] == "html":
                     c = 0
@@ -397,18 +389,7 @@ class Setup:
             if int(port) in self.login[ip][2:]:
                 if user == self.login['172.435.211.10'][1] and pas == self.login['172.435.211.10'][0]:
                     print("Connected.")
-                    pc = PC1()
-                    self.hard = self.harddrive
-                    self.mes = self.messages
-                    self.tx = self.txt
-                    self.basher = self.bash
-                    self.harddrive = pc.harddrive
-                    self.messages = pc.mas
-                    self.txt = pc.txt
-                    self.bash = pc.bash
-                    self.cl.append("dis")
-                    self.cl.append("download")
-                    
+                    self.comp = "1"
                 else:
                     print("Wrong details")
             else:
@@ -535,12 +516,13 @@ class Computers:
     def logins(self):
         self.login = {"172.435.211.10":(self.pas, "brobro", 25), "173.545.23.4":(self.pas, "admin", 80)}
 
-class PC1:
-    
-    harddrive = ["explorer.txt","users.txt", "data.txt", "dict.txt"]
-    mas = {"New":("Hey did you heard about that guy yesterday?", "")}
-    txt = ["me, you, him, she, it", "0xDB38A9477910E9334E3B9262C9847032905BC33DA2FF7B6E4F0C30EE503BDFEB77ED552E043FC205A4C44CB652633438", "wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"]
-    bash = "Han_Solo#> "
+class PC1(Setup):
+    def __init__(self):
+        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
+        self.harddrive = ["explorer.txt","users.txt", "data.txt", "dict.txt"]
+        self.mas = {"New":("Hey did you heard about that guy yesterday?", "")}
+        self.txt = ["me, you, him, she, it", "0xDB38A9477910E9334E3B9262C9847032905BC33DA2FF7B6E4F0C30EE503BDFEB77ED552E043FC205A4C44CB652633438", "wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"]
+        self.bash = "Han_Solo#> "
 
 class RE4:
 
@@ -549,8 +531,14 @@ class RE4:
     harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
     bash = "root#> "
     txt = ["<!Doctype html>"]
+    
 s = Setup()
-
+pc = PC1()
+pc.cl.append("dis")
+pc.cl.append("download")
 
 while True:
-    enter = s.commands(input(s.bash))
+    if s.comp == "mine":
+        enter = s.commands(input(s.bash))
+    elif s.comp == "1":
+        enter = pc.commands(input(pc.bash))

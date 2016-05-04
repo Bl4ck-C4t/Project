@@ -13,21 +13,19 @@ class Setup:
         print("Use 'help' to see commands")
         self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
         self.harddrive = ["explorer.exe", "File.txt"]
-        self.txt = ["Something..."]
+        self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
-        self.files = ["Ncrack", "Port scanner"]
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.comp = "mine"
         self.space = 2048
         self.used = 30
-        self.hard = None
-        self.mes = None
         self.txt = {}
-        self.basher = None
         self.generated = False
         self.login = c.login
         self.letters = c.letters
         self.crawling = False
+        self.mis1 = True
+        self.mis2 = True
 
 
     def admin(self):
@@ -36,7 +34,6 @@ class Setup:
         self.harddrive.append("Web_crawler.exe")
         print("Hi shadow!")
         self.bash = "MasterShadow#> "
-
 
         
     def ls(self):
@@ -47,68 +44,66 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        if self.cl[0:1][0] == ent:
+        if "ls" == ent and "ls" in self.cl:
             self.ls()
 
         elif "admin" == ent:
             self.admin()
 
-        elif self.cl[4:5][0] == ent:
+        elif "new" == ent and "new" in self.cl:
             self.new()
 
-        elif self.cl[1:2][0] == ent[:3]:
+        elif "run" == ent[:3] and "run" in self.cl:
             self.run(ent[4:])
 
-        elif self.cl[5:6][0] == ent:
+        elif "help" == ent and "help" in self.cl:
             self.help()
 
-        elif self.cl[2:3][0] == ent[:4]:
+        elif "mail" == ent[:4] and "mail" in self.cl:
             self.mail()
 
-        elif self.cl[3:4][0] == ent[:3]:
+        elif "web" == ent[:3] and "web" in self.cl:
             self.web(ent[4:])
 
-        elif self.cl[6:7][0] == ent:
+        elif "space" == ent and "space" in self.cl:
             print("You have {}/{}".format(self.used, self.space))
 
-        elif self.cl[7:8][0] == ent[:7]:
+        elif "connect" == ent[:7] and "connect" in self.cl:
             self.connect(ent[8:], ent[:-3:-1])
 
-        elif self.cl[8:9][0] == ent[:6]:
-            if self.hard == None:
-                abc = self.harddrive
-            elif self.hard != None:
-                abc = self.hard
-            if ent[7:] == "":
-                put = input("File to delete: ")
-                ent = ent + " " + put
-            if ent[7:] in abc:
-                abc.remove(ent[7:])
-                self.used -= self.pspace[ent[7:]]
-                print(ent[7:] + " deleted.")
-            elif not(ent[7:] in abc):
-                print("File not in harddrive.")
+        elif "delete" == ent[:6] and "delete" in self.cl:
+            self.ls()
+            en = input("Enter file name to delete: ")
+            if en in self.harddrive:
+                self.used -= self.pspace[en]
+                self.harddrive.remove(en)
+                print(en + " deleted.")
+            else:
+                print("{} not found.".format(en))
+            
 
         elif not(ent in self.cl):
             self.error()
         try:
-            if self.cl[9:10][0] == ent:
+            if "dis" == ent and "dis" in self.cl:
                 s.comp = "mine"
                 print("Disconnected.")
-                if "data.txt" in self.harddrive:
+                if "data.txt" in self.harddrive and self.mis1:
                     print("New message check mail!")
                     self.messages['Good Job'] = ("Well done, you recovered the file next i will need you to decrypt it. Use this website to download the decryptor: 'www.RE4.com' for any problems reply this", "")
                     c = Computers()
                     c.randromize(4,6)
-                if "download.html" in self.harddrive:
+                    self.mis1 = False
+                if "download.html" in self.harddrive and self.mis2:
                     print("New message check mail!")
                     self.messages['Well done'] = ("You got the downloads page just use this tool to get the files :D.","Web_open.exe")
                     c = Computers()
                     c.randromize(7,9)
+                    self.mis2 = False
         except IndexError:
             pass
         try:
-            if self.cl[10] == ent:
+            if "download" == ent and "download" in self.cl:
                 fls = []
                 print("Select Files: ")
                 for x in enumerate(self.harddrive, start=1):
@@ -151,24 +146,19 @@ class Setup:
     def run(self, pr):
         if len(pr) < 3:
             print("Wrong syntax: run [program.extension]")
-        elif pr[len(pr) - 1: len(pr) - 4: -1] == "txt" or pr[-1:-4:-1] == "html":
+        elif pr[::-1][:3] == "txt" or pr[::-1][:4] == "html":
             print("Data of file " + pr)
             print(self.txt[pr])
             
         elif pr in self.harddrive:
-            a = ""
-            for x in pr:
-                if x == ".":
-                    break
-                else:
-                    a += x
+            a = pr[::-1][4:][::-1]
             getattr(Setup, a)(self)
             
         else:
             print("Program not found.")
 
     def help(self):
-        print("ls - list programs, new - make a txt file, run - runs a program, mail - check mail, web - to access web, 'space' - space on harddrive, 'connect' - to connect to other computers, 'dis' - to disconnect from connected computer.")
+        print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.")
 
     def mail(self):
         
@@ -186,7 +176,7 @@ class Setup:
                 if tp in self.messages.keys():
                     if self.messages[tp][1] != "":
                         memory = 0
-                        for x in self.messags[tp][1:]:
+                        for x in self.messages[tp][1:]:
                             memory += self.pspace[x]
                         self.download([self.messages[tp][1]], memory, self.harddrive)
                     else:
@@ -194,13 +184,12 @@ class Setup:
                 else:
                     print("Unknown message.")
             else:
-                for x in enumerate(self.messages, start=1):
-                    if x[0] == int(enter):
-                        print("")
-                        print("Message: " + self.messages[x[1]][0])
-                        break
-                for x in enumerate(self.messages, start=1):
-                    print(str(x[0]) + ". " + x[1])
+                x = list(enumerate(self.messages, start=1))
+                if x[0][0] == int(enter):
+                    print("")
+                    print("Message: " + self.messages[x[0][1]][0])
+            for x in enumerate(self.messages, start=1):
+                print(str(x[0]) + ". " + x[1] + "(" + self.messages[x[1]][1] + ")")
             enter = input("Type a message to view('e' to exit, 'r [message title]' to reply', 'd' - to download attachment) ")
        
     def reply(self, mess):
@@ -292,7 +281,7 @@ class Setup:
             ent = input(str(len(files)) + " files are trying to download.('c - to cancel, 'y' - to download, 'i' - for inforamtion about the files) ")
         if ent == "c":
             print("Download canceled!")
-            
+
             
             
     def Ncrack(self):
@@ -313,10 +302,8 @@ class Setup:
         while ent != 'e':
             if ent == 'm':
                 print("You can use dictionary and brute force attacks with Ncrack, bruteforce guesses by trying one after another, dictonary uses a txt file to check password")
-                ent = input("Enter option: ")
             elif ent == 'a':
                 print("Ncrack is password breacking tool")
-                ent = input("Enter option: ")
             if ent == 's':
                 typ = input("Select method('[b]rute-force','[d]ictionary'): ")
                 ip = input("Enter ip: ")
@@ -345,7 +332,6 @@ class Setup:
                                     print("Try " + word + x + " - FAILED")
                         print("Password found: " + word)
                         print("The username is " + self.login[ip][1])
-                        ent = "e"
 
                     elif typ == "d" or typ == "dictionary":
                         self.ls()
@@ -362,17 +348,13 @@ class Setup:
                                 print("Sex")
                 else:
                     print("Unknown port")
-            else:
-                ent = input("Enter option: ")
+            ent = input("Enter option: ")
                 
-    def connect(self, ip, port):
-        if ip == '':
-            ip = input("Enter ip:port: ")
-            for x in ip:
-                if x == ":":
-                    port = ip[ip.index(x) + 1:]
-                    break
-        elif ip == "172.435.211.10":
+    def connect(self, ip='', port=''):
+        if ip == '' or port == '':
+            ip = input("Enter ip: ")
+            port = print("Enter port: ")
+        if ip == "172.435.211.10":
             port = input("Enter port: ")
             user = input("Enter username: ")
             pas = input("Enter password: ")
@@ -392,15 +374,7 @@ class Setup:
             if int(port) in self.login[ip][2:]:
                 if user == self.login['173.545.23.4'][1] and pas == self.login['173.545.23.4'][0]:
                     print("Connected.")
-                    pc = RE4()
-                    self.hard = self.harddrive
-                    self.mes = self.messages
-                    self.tx = self.txt
-                    self.basher = self.bash
-                    self.harddrive = pc.harddrive
-                    self.txt = pc.txt
-                    self.bash = pc.bash
-                    self.cl = ["ls", "run", 123, 1, 7, "help", "space", 8, "del", "dis", "download"]
+                    self.comp = "2"
                     
                 else:
                     print("Wrong details")
@@ -429,7 +403,7 @@ class Setup:
                         print("80 - Http port OPEN")
             else:
                 print("No such ip.")
-        else:
+        elif ent == 'e':
             print("Goodbye")
 
     def Web_crawler(self):
@@ -448,7 +422,6 @@ class Setup:
         while ent != "e":
             if ent == "a":
                 print("The crawler is used to catch sends and responses between servers and pages")
-                ent = input("Select option: ")
             elif ent == "c":
                 url = input("Enter page url: ")
                 print("Now enter the page from the 'web' ")
@@ -471,6 +444,18 @@ class Setup:
             elif ent == "s":
                 self.crawling = False
                 print("Stoped crawling")
+            print("""
+        Welcome to the
+         _    _  ____  ____       ___  ____    __    _    _  __    ____  ____   
+        ( \/\/ )( ___)(  _ \     / __)(  _ \  /__\  ( \/\/ )(  )  ( ___)(  _ \  
+         )    (  )__)  ) _ < ___( (__  )   / /(__)\  )    (  )(__  )__)  )   /  
+        (__/\__)(____)(____/(___)\___)(_)\_)(__)(__)(__/\__)(____)(____)(_)\_)
+        'c' - to start crawling
+        'a' - for about
+        'e' - for exit
+        's' - to stop crawling
+      """)
+            ent = input("Select option: ")
 
 
     def Web_open(self):
@@ -516,21 +501,25 @@ class PC1(Setup):
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.space = 2048
         self.used = 30
-class RE4:
-
-
-    se = Setup
-    harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
-    bash = "root#> "
-    txt = ["<!Doctype html>"]
-    
+class RE4(Setup):
+    def __init__(self):
+        self.cl = ["ls",  "run", 1, "web", "new", "help", "space", 1,"del","dis","download"]
+        self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
+        self.bash = "rootRE4#> "
+        self.txt = {"download.html":"<!Doctype html>"}
+        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.space = 4000
+        self.used = 400
+        
 s = Setup()
 pc = PC1()
 pc.cl.append("dis")
 pc.cl.append("download")
-
+RE = RE4()
 while True:
     if s.comp == "mine":
         enter = s.commands(input(s.bash))
     elif s.comp == "1":
         enter = pc.commands(input(pc.bash))
+    elif s.comp == "2":
+        enter = RE.commands(input(RE.bash))

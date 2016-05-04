@@ -1,5 +1,16 @@
 import time
 import random
+def HardCount(hard, file):
+    file1 = file[:file.index(".")]
+    ext = file[file.index("."):]
+    file = file1
+    c = 0
+    for x in hard:
+        if x == file + ext:
+            c += 1
+            file = "{}({})".format(file1, c)
+    return file + ext
+
 class Setup:
     
     def __init__(self):
@@ -11,12 +22,11 @@ class Setup:
         ent = input(self.bash)
         self.bash = ent + "#> "
         print("Use 'help' to see commands")
-        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
+        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","delete"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
-        self.comp = "mine"
         self.space = 2048
         self.used = 30
         self.txt = {}
@@ -73,58 +83,66 @@ class Setup:
 
         elif "delete" == ent[:6] and "delete" in self.cl:
             self.ls()
-            en = input("Enter file name to delete: ")
-            if en in self.harddrive:
-                self.used -= self.pspace[en]
-                self.harddrive.remove(en)
-                print(en + " deleted.")
+            en = input("Enter file number to delete: ")
+            if self.harddrive[int(en)-1] in self.harddrive:
+                self.used -= self.pspace[self.harddrive[int(en)-1]]
+                print(self.harddrive[int(en)-1] + " deleted.")
+                del self.harddrive[int(en)-1]
             else:
-                print("{} not found.".format(en))
+                print("{} not found.".format(self.harddrive[int(en)-1]))
             
 
         elif not(ent in self.cl):
             self.error()
         try:
             if "dis" == ent and "dis" in self.cl:
-                s.comp = "mine"
+                i.me = "mine"
                 print("Disconnected.")
-                if "data.txt" in self.harddrive and self.mis1:
+                if "data.txt" in s.harddrive and s.mis1:
                     print("New message check mail!")
-                    self.messages['Good Job'] = ("Well done, you recovered the file next i will need you to decrypt it. Use this website to download the decryptor: 'www.RE4.com' for any problems reply this", "")
+                    s.messages['Good Job'] = ("Well done, you recovered the file next i will need you to decrypt it. Use this website to download the decryptor: 'www.RE4.com' for any problems reply this", "")
                     c = Computers()
                     c.randromize(4,6)
-                    self.mis1 = False
-                if "download.html" in self.harddrive and self.mis2:
+                    s.mis1 = False
+                if "download.html" in s.harddrive and s.mis2:
                     print("New message check mail!")
-                    self.messages['Well done'] = ("You got the downloads page just use this tool to get the files :D.","Web_open.exe")
+                    s.messages['Well done'] = ("You got the downloads page just use this tool to get the files :D.","Web_open.exe")
                     c = Computers()
                     c.randromize(7,9)
-                    self.mis2 = False
+                    s.mis2 = False
         except IndexError:
             pass
         try:
             if "download" == ent and "download" in self.cl:
                 fls = []
-                print("Select Files: ")
-                for x in enumerate(self.harddrive, start=1):
-                    print(str(x[0]) + "." + " " + x[1])
-                en = input("Select file to download('d' - confirm, 'c' - cancel) ")
-                for x in enumerate(self.harddrive, start=1):
-                    print(str(x[0]) + "." + " " + x[1])
-                fls.append(self.harddrive[int(en) - 1])
-                enter = input("'d' - confirm, 'c' - cancel ")
-                if enter == "d" and fls[0][::-1][:3] == "exe":
-                    self.download(fls, 30, s.harddrive)
-                    print("File downloaded!")
-                if fls[0][::-1][:3] == "txt" or fls[0][::-1][:3] == "html":
-                    file = fls[0]
-                    file_txt = self.txt[file]
-                    s.txt[file] = file_txt
-                    s.used += s.pspace[file]
-                    s.harddrive.append(file)
-                    print("File downloaded!")
-                else:
-                    print("Download cancelled")
+                while True:
+                    for x in enumerate(self.harddrive, start=1):
+                        print(str(x[0]) + "." + " " + x[1])
+                    en = input("Select Files to download('d' - confirm, 'c' - cancel)(Current files:{}): ".format(str(fls)))
+                    if en == "d":
+                        for file in fls:
+                            if file in s.harddrive:
+                                print("The file {} exist it will be changed to {}".format(file, HardCount(s.harddrive,file)))
+                                if file[::-1][:3] == "exe":
+                                    s.pspace[HardCount(s.harddrive,file)] = s.pspace[file]
+                            if file[::-1][:3] == "exe":
+                                self.download(fls, 30, s.harddrive)
+                            else:
+                                file_txt = self.txt[file]
+                                size = len(file_txt)/5
+                                if s.used + size <= s.space:
+                                    file = HardCount(s.harddrive, file)
+                                    s.txt[file] = file_txt
+                                    s.pspace[file] = size
+                                    s.used += s.pspace[file]
+                                    s.harddrive.append(HardCount(s.harddrive, file))
+                        print("File/s downloaded!")
+                        break
+                    elif en == "c":
+                        print("Download cancelled")
+                        break
+                    else:
+                        fls.append(self.harddrive[int(en) - 1])
                         
 
         except IndexError:
@@ -133,15 +151,21 @@ class Setup:
     def new(self):
         print("Enter file name: ")
         name = input(s.bash)
-        self.harddrive.append(name + ".txt")
+        if name + ".txt" in self.harddrive:
+            check = input("File {} already exists. Create {} y/n".format(name + ".txt", HardCount(self.harddrive, name + ".txt")))
+            if check == "n":
+                print("File not created.")
         print("Enter text: ")
         ent = input(s.bash)
+        name = HardCount(self.harddrive, name + ".txt")
         space = int(len(ent) / 10)
         if self.used + space <= self.space:
             self.pspace[name] = space
             self.used += space
-            self.txt[name + ".txt"] = ent
+            self.txt[name] = ent
+            self.harddrive.append(name)
             print("Text written.")
+            print("File size " + str(space))
 
     def run(self, pr):
         if len(pr) < 3:
@@ -184,7 +208,7 @@ class Setup:
                 else:
                     print("Unknown message.")
             else:
-                x = list(enumerate(self.messages, start=1))
+                x = list(enumerate(self.messages.keys(), start=1))
                 if x[0][0] == int(enter):
                     print("")
                     print("Message: " + self.messages[x[0][1]][0])
@@ -211,6 +235,10 @@ class Setup:
 
     def web(self, url):
         if url == "www.h4u.com":
+            if "Ncrack.exe" in self.harddrive:
+                self.pspace[HardCount(self.harddrive, "Ncrack.exe")] = self.pspace['Ncrack.exe']
+            if "Port_scanner.exe" in self.harddrive:
+                self.pspace[HardCount(self.harddrive, "Port_scanner.exe")] = self.pspace['Port_scanner.exe']
             self.download(["Ncrack.exe", "Port_scanner.exe"], self.pspace['Ncrack.exe'] + self.pspace['Port_scanner.exe'], self.harddrive)
             self.messages['Getting used'] = ("So you managed to download the files. Ok so this is what you need to do: with the Port scanner scan for open ports '172.435.211.10' when you find use Ncracj to ahck the password and at the end connect to the computer and download the file data.txt, and also try downloading the file dict.txt - it will be useful later. ", "")
             time.sleep(0.7)
@@ -261,20 +289,36 @@ class Setup:
                     print(x)
                 print("")               
             elif ent == "y":
-                if self.used + size > self.space:
-                    print("No space to download files, try deleting some things")
-                    c = "c"
-                    break
+                try:
+                    if s.used + size > s.space:
+                        print("No space to download files, try deleting some things")
+                        c = "c"
+                        break
+                except NameError:
+                    if self.used + size > self.space:
+                        print("No space to download files, try deleting some things")
+                        c = "c"
+                        break
                 c = 10
                 while c < 110:
                     print(" "+"_"*10);print("|" + "#"*int((c/10)) + "_"*int((10 - (c/10))) + "|"); print(str(c) + "%")
                     c += 10
                     time.sleep(size/20)
                 print("Files downloaded")
-                for x in files:
-                    putin.append(x)
-                self.used += size
-                break
+                try:
+                    for x in files:
+                        if x in s.harddrive:
+                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
+                        putin.append(HardCount(putin, x))
+                        s.used += size
+                    break
+                except NameError:
+                    for x in files:
+                        if x in self.harddrive:
+                            print("The file {} exists it will be changed to {}".format(x, HardCount(self.harddrive, x)))
+                        putin.append(HardCount(putin, x))
+                        self.used += size
+                    break
             else:
                 print("Download canceled!")
                 break
@@ -285,7 +329,9 @@ class Setup:
             
             
     def Ncrack(self):
-        print("""
+        
+        while True:
+            print("""
         ███╗   ██╗ ██████╗██████╗  █████╗  ██████╗██╗  ██╗
         ████╗  ██║██╔════╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝
         ██╔██╗ ██║██║     ██████╔╝███████║██║     █████╔╝ 
@@ -298,8 +344,7 @@ class Setup:
         'a' - for about
         """)
               
-        ent = input("Enter option: ")
-        while ent != 'e':
+            ent = input("Enter option: ")
             if ent == 'm':
                 print("You can use dictionary and brute force attacks with Ncrack, bruteforce guesses by trying one after another, dictonary uses a txt file to check password")
             elif ent == 'a':
@@ -348,12 +393,14 @@ class Setup:
                                 print("Sex")
                 else:
                     print("Unknown port")
-            ent = input("Enter option: ")
+            elif ent == 'e':
+                break
+                
+            
                 
     def connect(self, ip='', port=''):
         if ip == '' or port == '':
             ip = input("Enter ip: ")
-            port = print("Enter port: ")
         if ip == "172.435.211.10":
             port = input("Enter port: ")
             user = input("Enter username: ")
@@ -361,7 +408,7 @@ class Setup:
             if int(port) in self.login[ip][2:]:
                 if user == self.login['172.435.211.10'][1] and pas == self.login['172.435.211.10'][0]:
                     print("Connected.")
-                    self.comp = "1"
+                    i.me = "1"
                 else:
                     print("Wrong details")
             else:
@@ -471,6 +518,12 @@ class Setup:
                 print("Unknown format.")
         else:
             print("File not in harddrive.")
+
+class Instance:
+
+    def __init__(self):
+        self.me = "mine"
+
 class Computers:
 
     
@@ -510,16 +563,16 @@ class RE4(Setup):
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.space = 4000
         self.used = 400
-        
+i = Instance()
 s = Setup()
 pc = PC1()
 pc.cl.append("dis")
 pc.cl.append("download")
 RE = RE4()
 while True:
-    if s.comp == "mine":
+    if i.me == "mine":
         enter = s.commands(input(s.bash))
-    elif s.comp == "1":
+    elif i.me == "1":
         enter = pc.commands(input(pc.bash))
-    elif s.comp == "2":
+    elif i.me == "2":
         enter = RE.commands(input(RE.bash))

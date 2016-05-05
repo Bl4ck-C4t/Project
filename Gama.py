@@ -1,8 +1,12 @@
 import time
 import random
 def HardCount(hard, file):
-    file1 = file[:file.index(".")]
-    ext = file[file.index("."):]
+    try:
+        file1 = file[:file.index(".")]
+        ext = file[file.index("."):]
+    except ValueError:
+        file1 = file
+        ext = ""
     file = file1
     c = 0
     for x in hard:
@@ -22,7 +26,7 @@ class Setup:
         ent = input(self.bash)
         self.bash = ent + "#> "
         print("Use 'help' to see commands")
-        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","delete"]
+        self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new", "help", "space", "connect","rm"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
@@ -30,6 +34,8 @@ class Setup:
         self.space = 2048
         self.used = 30
         self.txt = {}
+        self.folders = {}
+        self.location = "/C:"
         self.generated = False
         self.login = c.login
         self.letters = c.letters
@@ -60,6 +66,17 @@ class Setup:
         elif "admin" == ent:
             self.admin()
 
+        elif "mkdir" == ent[:5] and "mkdir" in self.cl:
+            folder_name = ent[6:]
+            if folder_name == "":
+                folder_name = input("Enter folder name: ")
+                
+            self.harddrive.append("FOLDER[{}]".format(folder_name))
+            self.folders[folder_name] = {"items":[]}
+            print("Folder " + folder_name + " created.")
+        elif "cd" == ent[:2] and "cd" in self.cl:
+            self.cd(ent[3:])
+
         elif "new" == ent and "new" in self.cl:
             self.new()
 
@@ -81,7 +98,7 @@ class Setup:
         elif "connect" == ent[:7] and "connect" in self.cl:
             self.connect(ent[8:], ent[:-3:-1])
 
-        elif "delete" == ent[:6] and "delete" in self.cl:
+        elif "rm" == ent[:2] and "rm" in self.cl:
             self.ls()
             en = input("Enter file number to delete: ")
             if self.harddrive[int(en)-1] in self.harddrive:
@@ -147,7 +164,35 @@ class Setup:
 
         except IndexError:
             pass
-
+    def Folder(self,patch):
+        if patch[-1] != "/":
+            patch += "/"
+        s_ind = 1
+        d_ind = patch[1:].index("/") + s_ind
+        if patch[0] != "/":
+            d_ind = patch[0:].index("/")
+            s_ind = 0
+        name = patch[s_ind:d_ind]
+        fol = self.folders[name]
+        while d_ind < len(patch)-1:
+            s_ind = d_ind + 1
+            d_ind = patch[s_ind:].index("/") + s_ind
+            name = patch[s_ind:d_ind]
+            fol = fol[name]
+        return fol
+    
+    def cd(self, patch):
+        if patch == "..":
+            lp = self.location[self.location[::-1][:self.location[::-1].index("/")]][::-1]
+            print(lp)
+        else:
+            self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
+            if patch[0] == "/":
+                self.location += patch
+            else:
+                self.location += "/" + patch
+            bn = self.bash[:self.bash.index("#")]
+            self.bash = bn + "/" + patch + "#> "
     def new(self):
         print("Enter file name: ")
         name = input(s.bash)
@@ -174,12 +219,12 @@ class Setup:
             print("Data of file " + pr)
             print(self.txt[pr])
             
-        elif pr in self.harddrive:
+        elif pr in self.harddrive and pr[::-1][:3] == "exe":
             a = pr[::-1][4:][::-1]
             getattr(Setup, a)(self)
             
         else:
-            print("Program not found.")
+            print("Program not found or unable to run")
 
     def help(self):
         print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.")
@@ -454,7 +499,9 @@ class Setup:
             print("Goodbye")
 
     def Web_crawler(self):
-        print("""
+        
+        while True":
+            print("""
         Welcome to the
          _    _  ____  ____       ___  ____    __    _    _  __    ____  ____   
         ( \/\/ )( ___)(  _ \     / __)(  _ \  /__\  ( \/\/ )(  )  ( ___)(  _ \  
@@ -465,8 +512,7 @@ class Setup:
         'e' - for exit
         's' - to stop crawling
       """)
-        ent = input("Select option: ")
-        while ent != "e":
+            ent = input("Select option: ")
             if ent == "a":
                 print("The crawler is used to catch sends and responses between servers and pages")
             elif ent == "c":
@@ -491,19 +537,9 @@ class Setup:
             elif ent == "s":
                 self.crawling = False
                 print("Stoped crawling")
-            print("""
-        Welcome to the
-         _    _  ____  ____       ___  ____    __    _    _  __    ____  ____   
-        ( \/\/ )( ___)(  _ \     / __)(  _ \  /__\  ( \/\/ )(  )  ( ___)(  _ \  
-         )    (  )__)  ) _ < ___( (__  )   / /(__)\  )    (  )(__  )__)  )   /  
-        (__/\__)(____)(____/(___)\___)(_)\_)(__)(__)(__/\__)(____)(____)(_)\_)
-        'c' - to start crawling
-        'a' - for about
-        'e' - for exit
-        's' - to stop crawling
-      """)
-            ent = input("Select option: ")
-
+            elif ent == "e":
+                break
+            
 
     def Web_open(self):
         self.ls()

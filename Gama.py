@@ -21,15 +21,15 @@ def search(ls,string):
             return True
     return False
 
-class Directories:
-    dirs = []
+class Dirs:
+    Dir = []
     def __init__(self,name,path):
         self.name = name
         self.path = path
         self.folder = []
 
     def __str__(self):
-        return self.name
+        return self.path
 
 class Setup:
     
@@ -40,6 +40,7 @@ class Setup:
         self.bash = "root#> "
         print("Enter username: ")
         ent = input(self.bash)
+        self.home = ent
         self.bash = ent + "#> "
         print("Use 'help' to see commands")
         self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new", "help", "space", "connect","rm"]
@@ -50,14 +51,21 @@ class Setup:
         self.space = 2048
         self.used = 30
         self.txt = {}
-        self.location = "/"
+        self.location = self.home
         self.generated = False
         self.login = c.login
         self.letters = c.letters
         self.crawling = False
         self.mis1 = True
         self.mis2 = True
-
+        Dirs.Dir.append(Dirs(self.home, self.home))
+        Dirs.Dir[0].folder = self.harddrive
+    
+    def searchF(self,name):
+        for x in Dirs.Dir:
+            if str(x) == name:
+                return x
+        return None
     
     
     def admin(self):
@@ -76,11 +84,10 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        comms = re.search(r"(( \D+)+)",ent)
+        comms = re.search(r"( .+)",ent)
         if comms != None:
             comms = comms.group()[1:]
             comms = comms.split(" ")
-            print(comms)
         ent = re.search(r"(\w+)", ent)
         ent = ent.group()
         
@@ -91,7 +98,11 @@ class Setup:
             self.admin()
 
         elif "mkdir" == ent and "mkdir" in self.cl:
-            re.search()
+            folder_name = comms[0]
+            Dirs.Dir.append(Dirs(folder_name, self.location + "/" + folder_name))
+            for x in Dirs.Dir:
+                if str(x) == self.location:
+                    x.folder.append("FOLDER[{}]".format(HardCount(x.folder,folder_name)))
             
         elif "cd" == ent and "cd" in self.cl:
             self.cd(comms[0])
@@ -183,47 +194,30 @@ class Setup:
 
         except IndexError:
             pass
-    
-    def FolderCheck(self,patch):
-        try:
-            s.Folder(patch)
-        except KeyError:
-            return False
-        return True
-    def cd(self, patch):
-        if patch == "..":
-            self.Folder(self.location[3:])["items"],self.harddrive = self.harddrive,self.Folder(self.location[3:])["items"]
-            self.location = self.location[:-self.location[::-1].index("/")-1]
-            nm = self.bash[:self.bash.index("/")]
-            self.bash = nm + self.location[3:] + "#> "
+    def cd(self, path):
+        if path == "..":
+            self.searchF(self.location).folder = self.harddrive
+            new_path = re.findall(r"/\w+",s.location)
+            new_path.insert(0, self.home)
+            last_folder = new_path.pop()
+            new_path = "".join(new_path)
+            self.harddrive = self.searchF(new_path).folder
+            self.bash = new_path + "#> "
+            self.location = new_path
+            
+        elif path == "../":
+            self.searchF(self.location).folder = self.harddrive
+            self.harddrive = Dirs.Dir[0].folder
+            self.location = self.home
+            self.bash = self.home + "#> "
         else:
-            if patch[0] != "/":
-                if self.FolderCheck(self.location[3:] + "/" + patch):
-                    ar = patch
-                    patch = self.location[3:] + "/" + patch
-                    self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
-                    if patch[0] == "/":
-                        self.location += ar
-                    else:
-                        self.location = "/" + ar
-                    bn = self.bash[:self.bash.index("#")]
-                    self.bash = bn + "/" + ar + "#> "
-                else:
-                    print("Non-exsistent folder.")
-            else:
-                if self.FolderCheck(self.location[3:] + patch):
-                    ar = patch
-                    patch = self.location[3:] + "/" + patch
-                    self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
-                    if patch[0] == "/":
-                        self.location += ar
-                    else:
-                        self.location = "/" + ar
-                    bn = self.bash[:self.bash.index("#")]
-                    self.bash = bn + "/" + ar + "#> "
-                else:
-                    print("Non-exsistent folder.")
-        print(self.folders)
+            name = path
+            path = "/" + path
+            self.searchF(self.location).folder = self.harddrive
+            self.location += path
+            self.harddrive = self.searchF(self.location).folder
+            self.bash = self.location + "#> "
+        
     def new(self):
         print("Enter file name: ")
         name = input(s.bash)

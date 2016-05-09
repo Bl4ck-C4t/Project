@@ -1,5 +1,6 @@
 import time
 import random
+import re
 def HardCount(hard, file):
     try:
         file1 = file[:file.index(".")]
@@ -14,6 +15,21 @@ def HardCount(hard, file):
             c += 1
             file = "{}({})".format(file1, c)
     return file + ext
+def search(ls,string):
+    for x in ls:
+        if str(x) == string:
+            return True
+    return False
+
+class Directories:
+    dirs = []
+    def __init__(self,name,path):
+        self.name = name
+        self.path = path
+        self.folder = []
+
+    def __str__(self):
+        return self.name
 
 class Setup:
     
@@ -34,8 +50,7 @@ class Setup:
         self.space = 2048
         self.used = 30
         self.txt = {}
-        self.folders = {}
-        self.location = "/C:"
+        self.location = "/"
         self.generated = False
         self.login = c.login
         self.letters = c.letters
@@ -43,7 +58,8 @@ class Setup:
         self.mis1 = True
         self.mis2 = True
 
-
+    
+    
     def admin(self):
         self.harddrive.append("Ncrack.exe")
         self.harddrive.append("Port_scanner.exe")
@@ -60,45 +76,48 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
+        comms = re.search(r"( \w+.+)",ent)
+        if comms != None:
+            comms = comms.group()[1:]
+            comms = comms.split(" ")
+            print(comms)
+        ent = re.search(r"(\w+)", ent)
+        ent = ent.group()
+        
         if "ls" == ent and "ls" in self.cl:
             self.ls()
 
         elif "admin" == ent:
             self.admin()
 
-        elif "mkdir" == ent[:5] and "mkdir" in self.cl:
-            folder_name = ent[6:]
-            if folder_name == "":
-                folder_name = input("Enter folder name: ")
-                
-            self.harddrive.append("FOLDER[{}]".format(folder_name))
-            self.folders[folder_name] = {"items":[]}
-            print("Folder " + folder_name + " created.")
-        elif "cd" == ent[:2] and "cd" in self.cl:
-            self.cd(ent[3:])
+        elif "mkdir" == ent and "mkdir" in self.cl:
+            re.search()
+            
+        elif "cd" == ent and "cd" in self.cl:
+            self.cd(comms[0])
 
         elif "new" == ent and "new" in self.cl:
             self.new()
 
-        elif "run" == ent[:3] and "run" in self.cl:
-            self.run(ent[4:])
+        elif "run" == ent and "run" in self.cl:
+            self.run(comms[0])
 
         elif "help" == ent and "help" in self.cl:
             self.help()
 
-        elif "mail" == ent[:4] and "mail" in self.cl:
+        elif "mail" == ent and "mail" in self.cl:
             self.mail()
 
-        elif "web" == ent[:3] and "web" in self.cl:
-            self.web(ent[4:])
+        elif "web" == ent and "web" in self.cl:
+            self.web(comms[0])
 
         elif "space" == ent and "space" in self.cl:
             print("You have {}/{}".format(self.used, self.space))
 
-        elif "connect" == ent[:7] and "connect" in self.cl:
-            self.connect(ent[8:], ent[:-3:-1])
+        elif "connect" == ent and "connect" in self.cl:
+            self.connect(comms[0], comms[1])
 
-        elif "rm" == ent[:2] and "rm" in self.cl:
+        elif "rm" == ent and "rm" in self.cl:
             self.ls()
             en = input("Enter file number to delete: ")
             if self.harddrive[int(en)-1] in self.harddrive:
@@ -164,35 +183,47 @@ class Setup:
 
         except IndexError:
             pass
-    def Folder(self,patch):
-        if patch[-1] != "/":
-            patch += "/"
-        s_ind = 1
-        d_ind = patch[1:].index("/") + s_ind
-        if patch[0] != "/":
-            d_ind = patch[0:].index("/")
-            s_ind = 0
-        name = patch[s_ind:d_ind]
-        fol = self.folders[name]
-        while d_ind < len(patch)-1:
-            s_ind = d_ind + 1
-            d_ind = patch[s_ind:].index("/") + s_ind
-            name = patch[s_ind:d_ind]
-            fol = fol[name]
-        return fol
     
+    def FolderCheck(self,patch):
+        try:
+            s.Folder(patch)
+        except KeyError:
+            return False
+        return True
     def cd(self, patch):
         if patch == "..":
-            lp = self.location[self.location[::-1][:self.location[::-1].index("/")]][::-1]
-            print(lp)
+            self.Folder(self.location[3:])["items"],self.harddrive = self.harddrive,self.Folder(self.location[3:])["items"]
+            self.location = self.location[:-self.location[::-1].index("/")-1]
+            nm = self.bash[:self.bash.index("/")]
+            self.bash = nm + self.location[3:] + "#> "
         else:
-            self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
-            if patch[0] == "/":
-                self.location += patch
+            if patch[0] != "/":
+                if self.FolderCheck(self.location[3:] + "/" + patch):
+                    ar = patch
+                    patch = self.location[3:] + "/" + patch
+                    self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
+                    if patch[0] == "/":
+                        self.location += ar
+                    else:
+                        self.location = "/" + ar
+                    bn = self.bash[:self.bash.index("#")]
+                    self.bash = bn + "/" + ar + "#> "
+                else:
+                    print("Non-exsistent folder.")
             else:
-                self.location += "/" + patch
-            bn = self.bash[:self.bash.index("#")]
-            self.bash = bn + "/" + patch + "#> "
+                if self.FolderCheck(self.location[3:] + patch):
+                    ar = patch
+                    patch = self.location[3:] + "/" + patch
+                    self.Folder(patch)["items"],self.harddrive = self.harddrive,self.Folder(patch)["items"]
+                    if patch[0] == "/":
+                        self.location += ar
+                    else:
+                        self.location = "/" + ar
+                    bn = self.bash[:self.bash.index("#")]
+                    self.bash = bn + "/" + ar + "#> "
+                else:
+                    print("Non-exsistent folder.")
+        print(self.folders)
     def new(self):
         print("Enter file name: ")
         name = input(s.bash)
@@ -253,10 +284,9 @@ class Setup:
                 else:
                     print("Unknown message.")
             else:
-                x = list(enumerate(self.messages.keys(), start=1))
-                if x[0][0] == int(enter):
-                    print("")
-                    print("Message: " + self.messages[x[0][1]][0])
+                x = list(enumerate(self.messages, start=1))[int(enter)-1][1]
+                print("")
+                print("Message: " + self.messages[x][0])
             for x in enumerate(self.messages, start=1):
                 print(str(x[0]) + ". " + x[1] + "(" + self.messages[x[1]][1] + ")")
             enter = input("Type a message to view('e' to exit, 'r [message title]' to reply', 'd' - to download attachment) ")
@@ -304,6 +334,13 @@ class Setup:
                 elif ent[0] == "d":
                     input("1 file is trying to download proceed?(y/n) ")
                     if self.crawling:
+                        print("Attaching to page.")
+                        time.sleep(0.5)
+                        print("Attaching to page..")
+                        time.sleep(0.5)
+                        print("Attaching to page...")
+                        time.sleep(0.5)
+                        print("Connected.")
                         print("Catching response..")
                         time.sleep(0.5)
                         print("Caught response 'Error 404'")
@@ -317,7 +354,7 @@ class Setup:
                     ent = input("Select option: ")
 
         elif url == "www.R4.com":
-            self.download(["Decryptor.exe"],self.pspace['Decryptor.exe'])
+            self.download(["Decryptor.exe"],self.pspace['Decryptor.exe'], self.harddrive)
             print("New message check mail.")
             self.messages['Nice'] = ("Beutiful now just decrypt the file and send me the text from it.","")
             
@@ -344,6 +381,12 @@ class Setup:
                         print("No space to download files, try deleting some things")
                         c = "c"
                         break
+                    try:
+                        if x in s.harddrive:
+                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
+                    except NameError:
+                        if x in self.harddrive:
+                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
                 c = 10
                 while c < 110:
                     print(" "+"_"*10);print("|" + "#"*int((c/10)) + "_"*int((10 - (c/10))) + "|"); print(str(c) + "%")
@@ -352,15 +395,11 @@ class Setup:
                 print("Files downloaded")
                 try:
                     for x in files:
-                        if x in s.harddrive:
-                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
                         putin.append(HardCount(putin, x))
                         s.used += size
                     break
                 except NameError:
                     for x in files:
-                        if x in self.harddrive:
-                            print("The file {} exists it will be changed to {}".format(x, HardCount(self.harddrive, x)))
                         putin.append(HardCount(putin, x))
                         self.used += size
                     break
@@ -466,7 +505,7 @@ class Setup:
             if int(port) in self.login[ip][2:]:
                 if user == self.login['173.545.23.4'][1] and pas == self.login['173.545.23.4'][0]:
                     print("Connected.")
-                    self.comp = "2"
+                    i.me = "2"
                     
                 else:
                     print("Wrong details")
@@ -500,7 +539,7 @@ class Setup:
 
     def Web_crawler(self):
         
-        while True":
+        while True:
             print("""
         Welcome to the
          _    _  ____  ____       ___  ____    __    _    _  __    ____  ____   
@@ -519,21 +558,6 @@ class Setup:
                 url = input("Enter page url: ")
                 print("Now enter the page from the 'web' ")
                 self.crawling = True
-                while self.crawling:
-                    enter = input(s.bash)
-                    if enter == "web " + url:
-                        print("Attaching to page.")
-                        time.sleep(0.5)
-                        print("Attaching to page..")
-                        time.sleep(0.5)
-                        print("Attaching to page...")
-                        time.sleep(0.5)
-                        print("Connected.")
-                    elif enter == "run Web_crawler.exe":
-                        print("Stopped crawling")
-                        self.crawling = False
-                    else:
-                        s.commands(enter)
             elif ent == "s":
                 self.crawling = False
                 print("Stoped crawling")
@@ -544,11 +568,9 @@ class Setup:
     def Web_open(self):
         self.ls()
         ent = input("Type filename to open website: ")
-        if ent in self.harddrive or ent in self.hard:
-            if ent[-1:-6:-1][::-1] == ".html":
-                name = ent[:len(ent)-5]
-                if name == "downloads":
-                    self.web("www.R4.com")
+        if ent in self.harddrive:
+            if ent == "download.html":
+                self.web("www.R4.com")
 
             else:
                 print("Unknown format.")

@@ -76,7 +76,7 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        comms = re.search(r"(( \D)+)",ent)
+        comms = re.search(r"(( \D+)+)",ent)
         if comms != None:
             comms = comms.group()[1:]
             comms = comms.split(" ")

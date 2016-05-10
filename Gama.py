@@ -84,10 +84,8 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        comms = re.search(r"( .+)",ent)
-        if comms != None:
-            comms = comms.group()[1:]
-            comms = comms.split(" ")
+        comms = re.search(r"( (?P<command>.+))",ent)
+        comms = comms.group("command")
         ent = re.search(r"(\w+)", ent)
         ent = ent.group()
         

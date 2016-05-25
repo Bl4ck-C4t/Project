@@ -1,7 +1,22 @@
 import time
 import random
 import re
-from asc import *
+def t2a(text):
+    chypher = ""
+    a = 0
+    for x in text:
+        chypher += chr(ord(x) + a)
+        a += 1
+    return chypher
+
+def a2t(asci):
+    dec = ""
+    a = 0
+    for x in asci:
+        dec += chr(ord(x) - a)
+        a += 1
+    return dec
+
 def HardCount(hard, file):
     try:
         file1 = file[:file.index(".")]

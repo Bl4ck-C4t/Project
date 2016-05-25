@@ -90,12 +90,9 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        comms = re.search(r"( .+)",ent)
-        if comms != None:
-            comms = comms.group()[1:]
-            comms = comms.split(" ")
-        ent = re.search(r"(\w+)", ent)
-        ent = ent.group()
+        comms = re.search(r"(?<= ).+",ent).group()
+        comms = comms.split(" ") 
+        ent = re.search(r"\w+", ent).group()
         
         if "ls" == ent and "ls" in self.cl:
             self.ls()
@@ -216,10 +213,8 @@ class Setup:
     def cd(self, path):
         if path == "..":
             self.searchF(self.location).folder = self.harddrive
-            new_path = re.findall(r"/\w+",s.location)
-            new_path.insert(0, self.home)
-            last_folder = new_path.pop()
-            new_path = "".join(new_path)
+            new_path = self.home
+            new_path += re.search(r'(?P<folders>((/\w+)+))(/\w+$)', self.location).group("folders")
             self.harddrive = self.searchF(new_path).folder
             self.bash = new_path + "#> "
             self.location = new_path

@@ -1,6 +1,7 @@
 import time
 import random
 import re
+from asc import *
 def HardCount(hard, file):
     try:
         file1 = file[:file.index(".")]
@@ -43,7 +44,7 @@ class Setup:
         self.home = ent
         self.bash = ent + "#> "
         print("Use 'help' to see commands")
-        self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new", "help", "space", "connect","rm"]
+        self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
@@ -69,9 +70,14 @@ class Setup:
     
     
     def admin(self):
+        self.harddrive.append("data.txt")
+        self.txt["data.txt"] = t2a("An0Nym0us:If you are done with the job just connect to the station(ip:95.126.234.24)")
+        self.used += 15
         self.harddrive.append("Ncrack.exe")
         self.harddrive.append("Port_scanner.exe")
         self.harddrive.append("Web_crawler.exe")
+        self.harddrive.append("Web_open.exe")
+        self.harddrive.append("Decryptor.exe")
         print("Hi shadow!")
         self.bash = "MasterShadow#> "
 
@@ -113,6 +119,9 @@ class Setup:
         elif "run" == ent and "run" in self.cl:
             self.run(comms[0])
 
+        elif "cat" == ent and "cat" in self.cl:
+            self.cat(comms[0])
+
         elif "help" == ent and "help" in self.cl:
             self.help()
 
@@ -126,7 +135,10 @@ class Setup:
             print("You have {}/{}".format(self.used, self.space))
 
         elif "connect" == ent and "connect" in self.cl:
-            self.connect(comms[0], comms[1])
+            if comms == None:
+                self.connect()
+            else:
+                self.connect(comms[0], comms[1])
 
         elif "rm" == ent and "rm" in self.cl:
             self.ls()
@@ -194,6 +206,13 @@ class Setup:
 
         except IndexError:
             pass
+    
+    def FolderCheck(self,patch):
+        try:
+            s.Folder(patch)
+        except KeyError:
+            return False
+        return True
     def cd(self, path):
         if path == "..":
             self.searchF(self.location).folder = self.harddrive
@@ -241,8 +260,7 @@ class Setup:
         if len(pr) < 3:
             print("Wrong syntax: run [program.extension]")
         elif pr[::-1][:3] == "txt" or pr[::-1][:4] == "html":
-            print("Data of file " + pr)
-            print(self.txt[pr])
+            print("Can't use run on non '.exe' files use 'cat' instead")
             
         elif pr in self.harddrive and pr[::-1][:3] == "exe":
             a = pr[::-1][4:][::-1]
@@ -250,6 +268,10 @@ class Setup:
             
         else:
             print("Program not found or unable to run")
+
+    def cat(self,file):
+        print("Data of file " + file)
+        print(self.txt[file])
 
     def help(self):
         print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.")
@@ -457,18 +479,22 @@ class Setup:
                         print("The username is " + self.login[ip][1])
 
                     elif typ == "d" or typ == "dictionary":
+                        found = False
                         self.ls()
                         ls = input("Enter dict name: ")
                         if ls in self.harddrive:
-                            c = 0
-                            for x in self.harddrive:
-                                if x == pr:
+                            dic = self.txt[ls]
+                            for x in dic:
+                                if x != self.login[ip][0]:
+                                    print(x + " - FAILED")
+                                else:
+                                    print(x + " - SUCCESS")
+                                    print("username: " + self.login[ip][1])
+                                    print("password found: " + x)
+                                    found = True
                                     break
-                                if x[len(x) - 1: len(x) - 4: -1] == "txt":
-                                    c += 1
-                            txt = self.txt[c]
-                            for x in txt:
-                                print("Sex")
+                            if not(found):
+                                print("Password not in dictionary.")
                 else:
                     print("Unknown port")
             elif ent == 'e':
@@ -505,6 +531,19 @@ class Setup:
                     print("Wrong details")
             else:
                 print("Port is curently closed")
+
+        elif ip == "95.126.234.24":
+            port = input("Enter port: ")
+            user = input("Enter username: ")
+            pas = input("Enter password: ")
+            if int(port) in self.login[ip][2:]:
+                if user == self.login['95.126.234.24'][1] and pas == self.login['95.126.234.24'][0]:
+                    print("Connected.")
+                    i.me = "3"
+                else:
+                    print("Wrong details")
+            else:
+                print("The port is currently closed")
                 
     def Port_scanner(self):
         print("""
@@ -571,6 +610,33 @@ class Setup:
         else:
             print("File not in harddrive.")
 
+    def Decryptor(self,file=""):
+        if file == "":
+            self.ls()
+            file = input("Enter filename: ")
+        if file in self.harddrive:
+            crypted = self.txt[file]
+            decrypted= a2t(crypted)
+            print("Analyzing...")
+            time.sleep(1)
+            print("Encryption found[ASCII]")
+            time.sleep(0.5)
+            if file != "data.txt":
+                print("[-]Not sure if file is encrypted. This will may cause false decryption.")
+                time.sleep(2)
+            print("Decrypting...")
+            time.sleep(0.6)
+            print("[+]File decrypted.")
+            time.sleep(0.4)
+            print("File info: {}".format(decrypted))
+            en = input("Write info to file? y/n ")
+            if en == "y" or en == "Y":
+                self.txt[file] = decrypted
+                print("File modified.")
+        else:
+            print("File not found.")
+        print("Exiting..")
+
 class Instance:
 
     def __init__(self):
@@ -594,33 +660,43 @@ class Computers:
             
 
     def logins(self):
-        self.login = {"172.435.211.10":(self.pas, "brobro", 25), "173.545.23.4":(self.pas, "admin", 80)}
+        self.login = {"172.435.211.10":(self.pas, "brobro", 25), "173.545.23.4":(self.pas, "admin", 80), "95.126.234.24":(self.pas, "root", 445, 21)}
 
 class PC1(Setup):
     def __init__(self):
-        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","del"]
+        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat","dis","download"]
         self.harddrive = ["explorer.shit","users.txt", "data.txt", "diction.txt"]
         self.messages = {"New":("Hey did you heard about that guy yesterday?", "")}
-        self.txt = {"users.txt":"me, you, him, she, it", "data.txt":"0xDB38A9477910E9334E3B9262C9847032905BC33DA2FF7B6E4F0C30EE503BDFEB77ED552E043FC205A4C44CB652633438", "diction.txt":"wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"}
+        self.txt = {"users.txt":"me, you, him, she, it", "data.txt":t2a("An0Nym0us:If you are done with the job just connect to the station(ip:95.126.234.24)"), "diction.txt":"wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"}
         self.bash = "Han_Solo#> "
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.space = 2048
         self.used = 30
 class RE4(Setup):
     def __init__(self):
-        self.cl = ["ls",  "run", 1, "web", "new", "help", "space", 1,"del","dis","download"]
+        self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
         self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
         self.bash = "rootRE4#> "
         self.txt = {"download.html":"<!Doctype html>"}
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.space = 4000
         self.used = 400
+
+class Station1(Setup):
+    def __init__(self):
+        self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
+        self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
+        self.bash = "ST1$root#> "
+        self.txt = {"download.html":"<!Doctype html>"}
+        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.space = 4000
+        self.used = 400
+        
 i = Instance()
 s = Setup()
 pc = PC1()
-pc.cl.append("dis")
-pc.cl.append("download")
 RE = RE4()
+st1 = Station1()
 while True:
     if i.me == "mine":
         enter = s.commands(input(s.bash))
@@ -628,3 +704,5 @@ while True:
         enter = pc.commands(input(pc.bash))
     elif i.me == "2":
         enter = RE.commands(input(RE.bash))
+    elif i.me == "3":
+        enter = st1.commands(input(st1.bash))

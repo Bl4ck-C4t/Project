@@ -1,6 +1,8 @@
 import time
 import random
 import re
+Login = None
+IP = None
 def t2a(text):
     chypher = ""
     a = 0
@@ -10,12 +12,15 @@ def t2a(text):
     return chypher
 
 def a2t(asci):
-    dec = ""
-    a = 0
-    for x in asci:
-        dec += chr(ord(x) - a)
-        a += 1
-    return dec
+    try:
+        dec = ""
+        a = 0
+        for x in asci:
+            dec += chr(ord(x) - a)
+            a += 1
+        return dec
+    except:
+        pass
 
 def HardCount(hard, file):
     try:
@@ -52,7 +57,6 @@ class Setup:
     def __init__(self):
         c = Computers()
         c.randromize(2,5)
-        c.logins()
         self.bash = "root#> "
         print("Enter username: ")
         ent = input(self.bash)
@@ -63,7 +67,7 @@ class Setup:
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
         self.space = 2048
         self.used = 30
         self.txt = {}
@@ -74,6 +78,7 @@ class Setup:
         self.crawling = False
         self.mis1 = True
         self.mis2 = True
+        self.hash = False
         Dirs.Dir.append(Dirs(self.home, self.home))
         Dirs.Dir[0].folder = self.harddrive
     
@@ -85,6 +90,8 @@ class Setup:
     
     
     def admin(self):
+        self.harddrive.append("hashdump_install.exe")
+        self.used += self.pspace["hashdump_install.exe"]
         self.harddrive.append("data.txt")
         self.txt["data.txt"] = t2a("An0Nym0us:If you are done with the job just connect to the station(ip:95.126.234.24)")
         self.used += 15
@@ -105,9 +112,12 @@ class Setup:
         print("Unrecognized/Unknown command. Type 'help' for syntax")
         
     def commands(self, ent):
-        comms = re.search(r"(?<= ).+",ent).group()
-        comms = comms.split(" ") 
-        ent = re.search(r"\w+", ent).group()
+        comms = re.search(r"( .+)",ent)
+        if comms != None:
+            comms = comms.group()[1:]
+            comms = comms.split(" ")
+        ent = re.search(r"(\w+)", ent)
+        ent = ent.group()
         
         if "ls" == ent and "ls" in self.cl:
             self.ls()
@@ -142,6 +152,9 @@ class Setup:
 
         elif "web" == ent and "web" in self.cl:
             self.web(comms[0])
+
+        elif "hashdump" == ent and "hashdump" in self.cl:
+            self.hashdump()
 
         elif "space" == ent and "space" in self.cl:
             print("You have {}/{}".format(self.used, self.space))
@@ -228,8 +241,10 @@ class Setup:
     def cd(self, path):
         if path == "..":
             self.searchF(self.location).folder = self.harddrive
-            new_path = self.home
-            new_path += re.search(r'(?P<folders>((/\w+)+))(/\w+$)', self.location).group("folders")
+            new_path = re.findall(r"/\w+",s.location)
+            new_path.insert(0, self.home)
+            last_folder = new_path.pop()
+            new_path = "".join(new_path)
             self.harddrive = self.searchF(new_path).folder
             self.bash = new_path + "#> "
             self.location = new_path
@@ -282,6 +297,37 @@ class Setup:
     def cat(self,file):
         print("Data of file " + file)
         print(self.txt[file])
+
+    def hashdump_install(self):
+        print("Installing hashdump...")
+        time.sleep(2)
+        print("hashdump command installed.")
+        print("command cant be used on your own PC")
+        print("Remove the installer")
+        self.hash = True
+
+    def hashdump(self):
+        print("Obtaining os boot key...")
+        time.sleep(0.6)
+        print("Success")
+        time.sleep(0.4)
+        print("Collecting hashes...")
+        time.sleep(1)
+        if not("FOLDER[HASHES]" in s.harddrive):
+            Dirs.Dir.append(Dirs("HASHES", s.home + "/HASHES"))
+            s.harddrive.append("FOLDER[HASHES]")
+        for x in Dirs.Dir:
+            if x.path == s.home + "/HASHES":
+                mem = int(len(self.hashes) / 10)
+                if mem + s.used <= s.space:
+                    name = HardCount(x.folder, "({})hash.txt".format(str(IP)))
+                    x.folder.append(name) 
+                    s.pspace[name] = mem
+                    s.txt[name] = self.hashes
+                    print("Hashes collected and saved at /FOLDER[HASHES]")
+                else:
+                    print("No space")
+        print("Hashes: " + self.hashes)
 
     def help(self):
         print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.")
@@ -513,6 +559,7 @@ class Setup:
             
                 
     def connect(self, ip='', port=''):
+        global IP
         if ip == '' or port == '':
             ip = input("Enter ip: ")
         if ip == "172.435.211.10":
@@ -554,6 +601,8 @@ class Setup:
                     print("Wrong details")
             else:
                 print("The port is currently closed")
+               
+        IP = ip
                 
     def Port_scanner(self):
         print("""
@@ -632,20 +681,27 @@ class Setup:
             print("Encryption found[ASCII]")
             time.sleep(0.5)
             if file != "data.txt":
-                print("[-]Not sure if file is encrypted. This will may cause false decryption.")
+                print("[-]Not sure if file is encrypted. This will may cause false decryption or failure.")
                 time.sleep(2)
             print("Decrypting...")
             time.sleep(0.6)
-            print("[+]File decrypted.")
-            time.sleep(0.4)
-            print("File info: {}".format(decrypted))
-            en = input("Write info to file? y/n ")
-            if en == "y" or en == "Y":
-                self.txt[file] = decrypted
-                print("File modified.")
+            if decrypted != None:
+                print("[+]File decrypted.")
+                time.sleep(0.4)
+                print("File info: {}".format(decrypted))
+                en = input("Write info to file? y/n ")
+                if en == "y" or en == "Y":
+                    self.txt[file] = decrypted
+                    print("File modified.")
+            else:
+                print("[-]Decryption failed.")
         else:
             print("File not found.")
+        if file == "data.txt":
+            self.messages["Fine"] = ["Ok, so just follow the trail in the file. btw install this new command from the attachment it's useful","hashdump_install.exe"]
         print("Exiting..")
+            
+                
 
 class Instance:
 
@@ -667,13 +723,13 @@ class Computers:
             self.pas += self.letters[random.randint(0,len(self.letters) - 1)]
             self.pas1 += self.letters[random.randint(0,len(self.letters) - 1)]
             c += 1
-            
-
-    def logins(self):
         self.login = {"172.435.211.10":(self.pas, "brobro", 25), "173.545.23.4":(self.pas, "admin", 80), "95.126.234.24":(self.pas, "root", 445, 21)}
+        global Login
+        Login = self.login
 
 class PC1(Setup):
     def __init__(self):
+        self.hashes = "Administrator:" + str(hash(str(Login["172.435.211.10"][0])))
         self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat","dis","download"]
         self.harddrive = ["explorer.shit","users.txt", "data.txt", "diction.txt"]
         self.messages = {"New":("Hey did you heard about that guy yesterday?", "")}
@@ -684,6 +740,7 @@ class PC1(Setup):
         self.used = 30
 class RE4(Setup):
     def __init__(self):
+        self.hashes = "Admin:" + str(hash(str(Login["173.545.23.4"][0])))
         self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
         self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
         self.bash = "rootRE4#> "
@@ -694,6 +751,7 @@ class RE4(Setup):
 
 class Station1(Setup):
     def __init__(self):
+        self.hashes = "User:" + str(hash(str(Login["95.126.234.24"][0])))
         self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
         self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
         self.bash = "ST1$root#> "
@@ -716,3 +774,7 @@ while True:
         enter = RE.commands(input(RE.bash))
     elif i.me == "3":
         enter = st1.commands(input(st1.bash))
+    if s.hash:
+        pc.cl.append("hashdump")
+        RE.cl.append("hashdump")
+        st1.cl.append("hashdump")

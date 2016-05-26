@@ -55,8 +55,6 @@ class Dirs:
 class Setup:
     
     def __init__(self):
-        c = Computers()
-        c.randromize(2,5)
         self.bash = "root#> "
         print("Enter username: ")
         ent = input(self.bash)
@@ -73,12 +71,12 @@ class Setup:
         self.txt = {}
         self.location = self.home
         self.generated = False
-        self.login = c.login
-        self.letters = c.letters
         self.crawling = False
         self.mis1 = True
         self.mis2 = True
         self.hash = False
+        self.LAN = False
+        self.LAN_net = None
         Dirs.Dir.append(Dirs(self.home, self.home))
         Dirs.Dir[0].folder = self.harddrive
     
@@ -100,6 +98,7 @@ class Setup:
         self.harddrive.append("Web_crawler.exe")
         self.harddrive.append("Web_open.exe")
         self.harddrive.append("Decryptor.exe")
+        self.harddrive.append("LAN_installer.exe")
         print("Hi shadow!")
         self.bash = "MasterShadow#> "
 
@@ -144,6 +143,9 @@ class Setup:
         elif "cat" == ent and "cat" in self.cl:
             self.cat(comms[0])
 
+        elif "LAN" == ent and "LAN" in self.cl:
+            self.LAN_connect(comms[0],comms[1])
+
         elif "help" == ent and "help" in self.cl:
             self.help()
 
@@ -185,14 +187,10 @@ class Setup:
                 if "data.txt" in s.harddrive and s.mis1:
                     print("New message check mail!")
                     s.messages['Good Job'] = ("Well done, you recovered the file next i will need you to decrypt it. Use this website to download the decryptor: 'www.RE4.com' for any problems reply this", "")
-                    c = Computers()
-                    c.randromize(4,6)
                     s.mis1 = False
                 if "download.html" in s.harddrive and s.mis2:
                     print("New message check mail!")
                     s.messages['Well done'] = ("You got the downloads page just use this tool to get the files :D.","Web_open.exe")
-                    c = Computers()
-                    c.randromize(7,9)
                     s.mis2 = False
         except IndexError:
             pass
@@ -288,8 +286,11 @@ class Setup:
             print("Can't use run on non '.exe' files use 'cat' instead")
             
         elif pr in self.harddrive and pr[::-1][:3] == "exe":
-            a = pr[::-1][4:][::-1]
-            getattr(Setup, a)(self)
+            if pr == "Ncrack.exe":
+                Ncrack()
+            else: 
+                a = pr[::-1][4:][::-1]
+                getattr(Setup, a)(self)
             
         else:
             print("Program not found or unable to run")
@@ -350,7 +351,7 @@ class Setup:
                         memory = 0
                         for x in self.messages[tp][1:]:
                             memory += self.pspace[x]
-                        self.download([self.messages[tp][1]], memory, self.harddrive)
+                        self.download([self.messages[tp][1:]], memory, self.harddrive)
                     else:
                         print("No attachment.")
                 else:
@@ -484,124 +485,41 @@ class Setup:
 
             
             
-    def Ncrack(self):
-        
-        while True:
-            print("""
-        ███╗   ██╗ ██████╗██████╗  █████╗  ██████╗██╗  ██╗
-        ████╗  ██║██╔════╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝
-        ██╔██╗ ██║██║     ██████╔╝███████║██║     █████╔╝ 
-        ██║╚██╗██║██║     ██╔══██╗██╔══██║██║     ██╔═██╗ 
-        ██║ ╚████║╚██████╗██║  ██║██║  ██║╚██████╗██║  ██╗
-        ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-        'm' - to see methods for cracking
-        's' - to start seting the cracking
-        'e' - to exit
-        'a' - for about
-        """)
-              
-            ent = input("Enter option: ")
-            if ent == 'm':
-                print("You can use dictionary and brute force attacks with Ncrack, bruteforce guesses by trying one after another, dictonary uses a txt file to check password")
-            elif ent == 'a':
-                print("Ncrack is password breacking tool")
-            if ent == 's':
-                typ = input("Select method('[b]rute-force','[d]ictionary'): ")
-                ip = input("Enter ip: ")
-                p = input("Enter port: ")
-                if int(p) in self.login[ip][2:]:
-                    
-                    if typ == "b" or typ == "bruteforce" or typ == "brute-force":
-                        
-                        print("Trying to connect...")
-                        time.sleep(0.6)
-                        print("Connected.")
-                        time.sleep(0.3)
-                        print("Starting to crack using bruteforce on port " + p)
-                        word = ""
-                        counter = 0
-                        while word != self.login[ip][0]:
-                            for x in self.letters:
-                                if x == self.login[ip][0][counter]:
-                                    time.sleep(0.1)
-                                    print("Try " + word + x + " - SUCCESS")
-                                    word += x
-                                    counter += 1
-                                    break
-                                else:
-                                    time.sleep(0.1)
-                                    print("Try " + word + x + " - FAILED")
-                        print("Password found: " + word)
-                        print("The username is " + self.login[ip][1])
-
-                    elif typ == "d" or typ == "dictionary":
-                        found = False
-                        self.ls()
-                        ls = input("Enter dict name: ")
-                        if ls in self.harddrive:
-                            dic = self.txt[ls]
-                            for x in dic:
-                                if x != self.login[ip][0]:
-                                    print(x + " - FAILED")
-                                else:
-                                    print(x + " - SUCCESS")
-                                    print("username: " + self.login[ip][1])
-                                    print("password found: " + x)
-                                    found = True
-                                    break
-                            if not(found):
-                                print("Password not in dictionary.")
-                else:
-                    print("Unknown port")
-            elif ent == 'e':
-                break
-                
+    
             
                 
     def connect(self, ip='', port=''):
         global IP
         if ip == '' or port == '':
             ip = input("Enter ip: ")
-        if ip == "172.435.211.10":
-            port = input("Enter port: ")
-            user = input("Enter username: ")
-            pas = input("Enter password: ")
-            if int(port) in self.login[ip][2:]:
-                if user == self.login['172.435.211.10'][1] and pas == self.login['172.435.211.10'][0]:
-                    print("Connected.")
+
+        port = input("Enter port: ")
+        user = input("Enter username: ")
+        pas = input("Enter password: ")
+        if ip == PC1.address:
+            a = PC1
+        elif ip == RE4.address:
+            a = RE4
+        elif ip == Station1.address:
+            a = Station1
+        elif ip == Mainframe1.address:
+            a = Mainframe1
+        if int(port) in a.ports:
+            if a.name == user and a.password == pas:
+                if a == PC1:
                     i.me = "1"
-                else:
-                    print("Wrong details")
-            else:
-                print("The port is currently closed")
-
-        elif ip == "173.545.23.4":
-            port = input("Enter port: ")
-            user = input("Enter username: ")
-            pas = input("Enter password: ")
-            if int(port) in self.login[ip][2:]:
-                if user == self.login['173.545.23.4'][1] and pas == self.login['173.545.23.4'][0]:
-                    print("Connected.")
+                elif a == RE4:
                     i.me = "2"
-                    
-                else:
-                    print("Wrong details")
-            else:
-                print("Port is curently closed")
-
-        elif ip == "95.126.234.24":
-            port = input("Enter port: ")
-            user = input("Enter username: ")
-            pas = input("Enter password: ")
-            if int(port) in self.login[ip][2:]:
-                if user == self.login['95.126.234.24'][1] and pas == self.login['95.126.234.24'][0]:
-                    print("Connected.")
+                elif a == Station1:
                     i.me = "3"
-                else:
-                    print("Wrong details")
+                elif a == Mainframe1:
+                    i.me = "4"
+                print("Connected.")
+                time.sleep(0.5)
             else:
-                print("The port is currently closed")
-               
+                print("Wrong details.")
+        else:
+            print("The port is closed")
         IP = ip
                 
     def Port_scanner(self):
@@ -699,7 +617,32 @@ class Setup:
             print("File not found.")
         if file == "data.txt":
             self.messages["Fine"] = ["Ok, so just follow the trail in the file. btw install this new command from the attachment it's useful","hashdump_install.exe"]
+            print("New message!")
         print("Exiting..")
+
+    def LAN_installer(self):
+        print("Installing LAN interface...")
+        time.sleep(2)
+        self.LAN = True
+        print("LAN installed")
+        print("usage LAN [IP] [username:password](username and password can be hashes)")
+
+    def LAN_connect(self,ip,data):
+        a = False
+        if self.LAN_net != None:
+            for x in self.LAN_net:
+                if x.lan_address == ip:
+                    if x.hashes == data:
+                        a = True
+                        i.me = x.n
+                        print("Authenting as {}".format(data[:data.index(":")]))
+                        time.sleep(0.5)
+                        print("Using password: {}".format(data[data.index(":") + 1:]))
+                        print("Connected.")
+                        time.sleep(0.5)
+            if not(a):
+                print("Not such a device")
+                    
             
                 
 
@@ -726,9 +669,17 @@ class Computers:
         self.login = {"172.435.211.10":(self.pas, "brobro", 25), "173.545.23.4":(self.pas, "admin", 80), "95.126.234.24":(self.pas, "root", 445, 21)}
         global Login
         Login = self.login
+        return self.pas
 
 class PC1(Setup):
+    n = "1"
+    address = "172.435.211.10"
+    ports = [25]
+    name = "brobro"
+    password = Computers.randromize(Computers,2,5)
+    hard = 0.1
     def __init__(self):
+        self.LAN_net = None
         self.hashes = "Administrator:" + str(hash(str(Login["172.435.211.10"][0])))
         self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat","dis","download"]
         self.harddrive = ["explorer.shit","users.txt", "data.txt", "diction.txt"]
@@ -738,8 +689,16 @@ class PC1(Setup):
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
         self.space = 2048
         self.used = 30
+        
 class RE4(Setup):
+    n = "2"
+    address = "173.545.23.4"
+    ports = [80]
+    name = "admin"
+    password = Computers.randromize(Computers,4,6)
+    hard = 0.3
     def __init__(self):
+        self.LAN_net = None
         self.hashes = "Admin:" + str(hash(str(Login["173.545.23.4"][0])))
         self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
         self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
@@ -750,21 +709,136 @@ class RE4(Setup):
         self.used = 400
 
 class Station1(Setup):
+    n = "3"
+    address = "95.126.234.24"
+    lan_address = "192.168.1.3"
+    ports = [445,21]
+    name = "root"
+    password = Computers.randromize(Computers,3,5)
+    hard = 0.2
     def __init__(self):
+        self.LAN_net = [Mainframe1]
         self.hashes = "User:" + str(hash(str(Login["95.126.234.24"][0])))
-        self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
-        self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
+        self.cl = ["ls",  "run","web", "new", "help", "space","cat","rm","dis","download"]
+        self.harddrive = ["yup.txt","explorer.exe", "File.txt"]
         self.bash = "ST1$root#> "
-        self.txt = {"download.html":"<!Doctype html>"}
+        self.txt = {"yup.txt":"Nope", "File.txt":"0101010101101010101011010101101101010"}
         self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.messages = {"Access":["Alright so this is your access","LAN_installer.exe"]}
         self.space = 4000
-        self.used = 400
-        
+        self.used = 200
+
+class Mainframe1(Setup):
+    n = "4"
+    address = "224.123.68.23"
+    ports = [445]
+    lan_address = "192.168.1.2"
+    name = "main_root"
+    password = Computers.randromize(Computers,8,10)
+    hard = 1
+    def __init__(self):
+        self.LAN_net = None
+        self.hashes = "Mainframe:" + str(hash(str(Login["95.126.234.24"][0])))
+        self.cl = ["ls",  "run","web", "new", "help", "space","cat","rm","dis","download"]
+        self.harddrive = ["yup.txt","explorer.exe", "File.txt"]
+        self.bash = "MAINFRAME#> "
+        self.txt = {"yup.txt":"Nope", "File.txt":"0101010101101010101011010101101101010"}
+        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.messages = {"Access":["Alright so this is your access","LAN_installer.exe"]}
+        self.space = 4000
+        self.used = 200
+
+
+                
 i = Instance()
 s = Setup()
 pc = PC1()
 RE = RE4()
 st1 = Station1()
+m1 = Mainframe1()
+st1.LAN_net = [m1]
+m1.LAN_net = [st1]
+
+def Ncrack():
+    letters = "abcdefghijklmnopqrstuvwxyz0123456789"
+    while True:
+        print("""
+        ███╗   ██╗ ██████╗██████╗  █████╗  ██████╗██╗  ██╗
+        ████╗  ██║██╔════╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝
+        ██╔██╗ ██║██║     ██████╔╝███████║██║     █████╔╝ 
+        ██║╚██╗██║██║     ██╔══██╗██╔══██║██║     ██╔═██╗ 
+        ██║ ╚████║╚██████╗██║  ██║██║  ██║╚██████╗██║  ██╗
+        ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+        'm' - to see methods for cracking
+        's' - to start seting the cracking
+        'e' - to exit
+        'a' - for about
+        """)
+              
+        ent = input("Enter option: ")
+        if ent == 'm':
+            print("You can use dictionary and brute force attacks with Ncrack, bruteforce guesses by trying one after another, dictonary uses a txt file to check password")
+        elif ent == 'a':
+            print("Ncrack is password breacking tool")
+        if ent == 's':
+            typ = input("Select method('[b]rute-force','[d]ictionary'): ")
+            ip = input("Enter ip: ")
+            p = input("Enter port: ")
+            if ip == pc.address:
+                a = pc
+            elif ip == RE.address:
+                a = RE
+            elif ip == st1.address:
+                a = st1
+            elif ip == m1.address:
+                a = m1
+            if int(p) in a.ports:
+                    
+                if typ == "b" or typ == "bruteforce" or typ == "brute-force":
+                        
+                    print("Trying to connect...")
+                    time.sleep(0.6)
+                    print("Connected.")
+                    time.sleep(0.3)
+                    print("Starting to crack using bruteforce on port " + p)
+                    word = ""
+                    counter = 0
+                    while word != a.password:
+                        for x in letters:
+                            if x == a.password[counter]:
+                                time.sleep(0.1)
+                                print("Try " + word + x + " - SUCCESS")
+                                word += x
+                                counter += 1
+                                break
+                            else:
+                                time.sleep(a.hard)
+                                print("Try " + word + x + " - FAILED")
+                    print("Password found: " + word)
+                    print("The username is " + a.name)
+
+                elif typ == "d" or typ == "dictionary":
+                    found = False
+                    self.ls()
+                    ls = input("Enter dict name: ")
+                    if ls in self.harddrive:
+                        dic = self.txt[ls]
+                        for x in dic:
+                            if x != a.password:
+                                print(x + " - FAILED")
+                            else:
+                                print(x + " - SUCCESS")
+                                print("username: " + a.name)
+                                print("password found: " + x)
+                                found = True
+                                break
+                        if not(found):
+                            print("Password not in dictionary.")
+                else:
+                    print("Unknown port")
+        elif ent == 'e':
+            break
+
 while True:
     if i.me == "mine":
         enter = s.commands(input(s.bash))
@@ -774,7 +848,15 @@ while True:
         enter = RE.commands(input(RE.bash))
     elif i.me == "3":
         enter = st1.commands(input(st1.bash))
+    elif i.me == "4":
+        enter = m1.commands(input(m1.bash))
     if s.hash:
         pc.cl.append("hashdump")
         RE.cl.append("hashdump")
         st1.cl.append("hashdump")
+        m1.cl.append("hashdump")
+    if s.LAN:
+        pc.cl.append("LAN")
+        RE.cl.append("LAN")
+        st1.cl.append("LAN")
+        m1.cl.append("LAN")

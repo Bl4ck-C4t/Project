@@ -1,8 +1,33 @@
 import time
 import random
 import re
+import threading
+import sys
 Login = None
 IP = None
+
+
+class SecondCounter(threading.Thread):
+    
+    def __init__(self, interval=0.1):
+        threading.Thread.__init__(self)
+        self.interval = interval 
+        self.value = 0
+        self.alive = False
+    def run(self,stop):
+        self.alive = True
+        while self.alive:
+            time.sleep(self.interval)
+            self.value += self.interval
+            if self.value >= stop:
+                return "Time out"
+    def peek(self):
+        return self.value
+    def finish(self):
+        self.alive = False
+        return self.value
+
+
 def t2a(text):
     chypher = ""
     a = 0
@@ -48,12 +73,13 @@ class Dirs:
         self.name = name
         self.path = path
         self.folder = []
+        self.txt = {}
 
     def __str__(self):
         return self.path
 
 class Setup:
-    
+    hashls = {}
     def __init__(self):
         self.bash = "root#> "
         print("Enter username: ")
@@ -61,11 +87,11 @@ class Setup:
         self.home = ent
         self.bash = ent + "#> "
         print("Use 'help' to see commands")
-        self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat"]
+        self.cl = ["cd","mkdir","ls",  "run", "mail", "web", "new","getuid", "help", "space","mv", "connect","rm","cat"]
         self.harddrive = ["explorer.exe", "File.txt"]
         self.txt = {"File.txt":"Something..."}
         self.messages = {"Hello":["I am some one offering you job if you accept reply", ""]}
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
+        self.pspace = {"tracer.exe":50,"hashcat.exe":70,"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
         self.space = 2048
         self.used = 30
         self.txt = {}
@@ -74,9 +100,12 @@ class Setup:
         self.crawling = False
         self.mis1 = True
         self.mis2 = True
+        self.mis3 = True
         self.hash = False
         self.LAN = False
         self.LAN_net = None
+        self.uid = "NT/Authority System"
+        self.getsys = []
         Dirs.Dir.append(Dirs(self.home, self.home))
         Dirs.Dir[0].folder = self.harddrive
     
@@ -99,6 +128,8 @@ class Setup:
         self.harddrive.append("Web_open.exe")
         self.harddrive.append("Decryptor.exe")
         self.harddrive.append("LAN_installer.exe")
+        self.harddrive.append("msf.exe")
+        self.harddrive.append("hashcat.exe")
         print("Hi shadow!")
         self.bash = "MasterShadow#> "
 
@@ -124,6 +155,9 @@ class Setup:
         elif "admin" == ent:
             self.admin()
 
+        elif "passes" == ent:
+            print("PC1: {}, RE4: {}, Station1: {}, MAinframe1: {}".format(PC1.password,RE4.password,Station1.password,Mainframe1.password))
+
         elif "mkdir" == ent and "mkdir" in self.cl:
             folder_name = comms[0]
             Dirs.Dir.append(Dirs(folder_name, self.location + "/" + folder_name))
@@ -140,6 +174,15 @@ class Setup:
         elif "run" == ent and "run" in self.cl:
             self.run(comms[0])
 
+        elif "getuid" == ent and "getuid" in self.cl:
+            print(self.uid)
+
+        elif "getsystem" == ent:
+            self.getsystem()
+
+        elif "mv" == ent and "mv" in self.cl:
+            self.move(comms[0],comms[1])
+
         elif "cat" == ent and "cat" in self.cl:
             self.cat(comms[0])
 
@@ -149,6 +192,15 @@ class Setup:
         elif "help" == ent and "help" in self.cl:
             self.help()
 
+        elif "scan" == ent and "scan" in self.cl:
+            try:
+                print("Results:")
+                for x in self.LAN_net:
+                    print("({}){}".format(x.__name__,x.lan_address))
+
+            except:
+                print("No LAN found")
+
         elif "mail" == ent and "mail" in self.cl:
             self.mail()
 
@@ -157,6 +209,10 @@ class Setup:
 
         elif "hashdump" == ent and "hashdump" in self.cl:
             self.hashdump()
+
+        elif "hashlist" == ent:
+            for x in Setup.hashls.keys():
+                print("{}: {}".format(x,str(Setup.hashls[x])))
 
         elif "space" == ent and "space" in self.cl:
             print("You have {}/{}".format(self.used, self.space))
@@ -192,6 +248,10 @@ class Setup:
                     print("New message check mail!")
                     s.messages['Well done'] = ("You got the downloads page just use this tool to get the files :D.","Web_open.exe")
                     s.mis2 = False
+                if "attack_list.txt" in s.harddrive and s.mis3:
+                     print("New message check mail!")
+                     s.mis3 = False
+                     s.messages['Hashcat'] = ["Nice job the attack_list shows their new target so try to hack in first plant the tracer.exe virus and run it on Votepad servers to trace this guys, and btw you can use hashcat to decrypt the hashes you got","tracer.exe","hashcat.exe"]
         except IndexError:
             pass
         try:
@@ -239,17 +299,21 @@ class Setup:
     def cd(self, path):
         if path == "..":
             self.searchF(self.location).folder = self.harddrive
+            self.searchF(self.location).txt = self.txt
             new_path = re.findall(r"/\w+",s.location)
             new_path.insert(0, self.home)
             last_folder = new_path.pop()
             new_path = "".join(new_path)
             self.harddrive = self.searchF(new_path).folder
+            self.txt = self.searchF(new_path).txt
             self.bash = new_path + "#> "
             self.location = new_path
             
         elif path == "../":
             self.searchF(self.location).folder = self.harddrive
+            self.searchF(self.location).txt = self.txt
             self.harddrive = Dirs.Dir[0].folder
+            self.txt = Dirs.Dir[0].txt
             self.location = self.home
             self.bash = self.home + "#> "
         else:
@@ -258,7 +322,22 @@ class Setup:
             self.searchF(self.location).folder = self.harddrive
             self.location += path
             self.harddrive = self.searchF(self.location).folder
+            self.searchF(self.location).txt = self.txt
+            self.txt = self.searchF(self.location).txt
             self.bash = self.location + "#> "
+
+    def move(self,file,dest):
+        ext = re.search(r"\.(?P<ext>\w+)",file).group("ext")
+        folder = self.searchF(self.location + "/" + dest)
+        if ext == "txt":
+            txt = self.txt[file]
+            del self.txt[file]
+            self.harddrive.remove(file)
+            folder.txt[file] = txt
+            folder.folder.append(file)
+        elif ext == "exe":
+            self.harddrive.remove(file)
+            folder.folder.append(file)
         
     def new(self):
         print("Enter file name: ")
@@ -325,18 +404,47 @@ class Setup:
                     x.folder.append(name) 
                     s.pspace[name] = mem
                     s.txt[name] = self.hashes
+                    if not(IP in Setup.hashls.keys()):
+                        Setup.hashls[IP] = []
+                    Setup.hashls[IP].append(self.hashes)
                     print("Hashes collected and saved at /FOLDER[HASHES]")
                 else:
                     print("No space")
         print("Hashes: " + self.hashes)
 
-    def help(self):
-        print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.")
+    def hashcat(self):
+        self.commands("hashlist")
+        ip = input("Enter ip: ")
+        txt = input("Enter hashes to decrypt: ")
+        password = searchC(ip).password
+        method = input("[b]rutefore,[d]ictionary: ")
+        if method[0] == "b":
+            print("Starting bruteforce...")
+            time.sleep(len(password))
+            print("Hash decrypted:\n{}{}".format(txt[:txt.index(":") + 1],password))
+        else:
+            print("Not such a file")
 
+    def help(self):
+        print("ls - list programs\nnew - make a txt file\nrun - runs a program\nmail - check mail\nweb - to access web\nspace - space on harddrive\nconnect - to connect to other computers\ndis - to disconnect from connected computer.\n'getuid' - see current priviliges\n'getsystem' - try to evaluate.")
+
+    def getsystem(self):
+        if self.uid != "NT/Authority System":
+            if self.uid == "User":
+                if 1 in self.getsys:
+                    print("System got via technique 1 Named Pipe Impersonation (In Memory/Admin)")
+                elif 2 in self.getsys:
+                    print("System got via technique 2 Named Pipe Impersonation (Dropper/Admin)")
+                elif 3 in self.getsys:
+                    print("System got via technique 3 Token Duplication (In Memory/Admin)")
+                elif 0 in self.getsys:
+                    print("System got via all techniques")
+        else:
+            print("You already are System admin.")
     def mail(self):
         
         for x in enumerate(self.messages, start=1):
-            print(str(x[0]) + ". " + x[1] + "(" + self.messages[x[1]][1] + ")")
+            print(str(x[0]) + ". " + x[1] + str(self.messages[x[1]][1:]))
         enter = input("Type a message to view('e' to exit, 'r [message title]' to reply', 'd' - to download attachment) ")
         while enter != "e":
             if enter[0] == "r" and len(enter) > 1:
@@ -454,28 +562,23 @@ class Setup:
                         print("No space to download files, try deleting some things")
                         c = "c"
                         break
-                    try:
-                        if x in s.harddrive:
-                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
-                    except NameError:
-                        if x in self.harddrive:
-                            print("The file {} exists it will be changed to {}".format(x, HardCount(s.harddrive, x)))
+                
                 c = 10
                 while c < 110:
                     print(" "+"_"*10);print("|" + "#"*int((c/10)) + "_"*int((10 - (c/10))) + "|"); print(str(c) + "%")
                     c += 10
-                    time.sleep(size/20)
+                    time.sleep(size/60)
                 print("Files downloaded")
-                try:
-                    for x in files:
-                        putin.append(HardCount(putin, x))
-                        s.used += size
-                    break
-                except NameError:
-                    for x in files:
+                for x in files:
+                    if type(x) == list or type(x) == tuple:
+                        putin.append(HardCount(putin, x[0]))
+                        self.used += size
+                        
+                    else:
                         putin.append(HardCount(putin, x))
                         self.used += size
-                    break
+                        
+                break
             else:
                 print("Download canceled!")
                 break
@@ -617,7 +720,8 @@ class Setup:
             print("File not found.")
         if file == "data.txt":
             self.messages["Fine"] = ["Ok, so just follow the trail in the file. btw install this new command from the attachment it's useful","hashdump_install.exe"]
-            print("New message!")
+            self.messages["Exploitation"] = ["OK, so take this one it is used to exploit vulnarabilities in systems. Scan them first and then find a good exploit. Don't forget to use 'getsystem' to escalate privileges","msf.exe"]
+            print("New messages!")
         print("Exiting..")
 
     def LAN_installer(self):
@@ -625,14 +729,14 @@ class Setup:
         time.sleep(2)
         self.LAN = True
         print("LAN installed")
-        print("usage LAN [IP] [username:password](username and password can be hashes)")
+        print("usage LAN [IP] [username:password](username and password can be hashes) and 'scan' to reveal devicec on network ")
 
     def LAN_connect(self,ip,data):
         a = False
         if self.LAN_net != None:
             for x in self.LAN_net:
                 if x.lan_address == ip:
-                    if x.hashes == data:
+                    if self.hashes == data:
                         a = True
                         i.me = x.n
                         print("Authenting as {}".format(data[:data.index(":")]))
@@ -642,10 +746,95 @@ class Setup:
                         time.sleep(0.5)
             if not(a):
                 print("Not such a device")
-                    
-            
-                
 
+    def msf(self):
+        print("""
+                   Welcome to
+         __    ___  ___                      _       
+  /\/\  / _\  / __\/ __\___  _ __  ___  ___ | | ___  
+ /    \ \ \  / _\ / /  / _ \| '_ \/ __|/ _ \| |/ _ \ 
+/ /\/\ \_\ \/ /  / /__| (_) | | | \__ \ (_) | |  __/ 
+\/    \/\__/\/   \____/\___/|_| |_|___/\___/|_|\___| 
+                                                     
+    """)
+        exploit = ""
+        ls = ["net_api","spoolss","net_identity","nw_api","smb_relay","Isass","ms06_025_rras"]
+        global IPls
+        global IP
+        while True:
+            en = input("msfconsole{}#> ".format(exploit))
+            comms = re.search(r" (?P<params>.+)",en)
+            if comms != None:
+                comms = comms.group("params").split(" ")
+                en = re.search(r"(?P<enter>\w+) ",en)
+                en = en.group("enter")
+            if en == "help":
+                print("'scan [ip]' - to scan\n'expls' - to see exploits list\n'use [EXPLOIT NAME]' - to load exploit\n'show_options'\n'set [param] [value]' - to change a exploit setting\n'exploit' - to start exploiting ")
+                
+            elif en == "scan":
+                ip = comms[0]
+                for x in IPls:
+                    if x.address == ip:
+                        print("Scanning...")
+                        time.sleep(1)
+                        try:
+                            for vul in x.vuls:
+                                print("Vulnerability detected!\nPossible {} exploit".format(vul))
+
+
+                        except:
+                            print("Can't find vulnerabilities")
+            elif en == "expls":
+                print("Exploits: ")
+                time.sleep(1)
+                for x in ls:
+                    print(x)
+            elif en == "use":
+                ex = comms[0]
+                if ex in ls:
+                    exploit = "({})".format(ex)
+                    options = {}
+                    if ex == "net_api":
+                        options["LHOST"] = "127.0.0.1"
+                        options["RHOST"] = ""
+                else:
+                    print("no such an exploit")
+                    
+            elif en == "show_options":
+                ex = exploit[1:-1]
+                for x in options.keys():
+                    print("{}: {}".format(x,options[x]))
+
+            elif en == "set":
+                if comms[0] in options.keys():
+                    options[comms[0]] = comms[1]
+                    print("{} set to {}".format(comms[0],comms[1]))
+                else:
+                    print("Unknown param")
+
+            elif en == "exploit":
+                ex = exploit[1:-1]
+                for x in IPls:
+                    if x.address == options["RHOST"]:
+                          rhost = x
+                if ex == "net_api":
+                    print("Connecting to target...")
+                    time.sleep(0.5)
+                    if ex in rhost.vuls:
+                        print("Sending stage..")
+                        time.sleep(2)
+                        print("Session opened!")
+                        i.me = rhost.n
+                        IP = rhost.address
+                        break
+
+            elif en == "e":
+                print("Goodbye")
+                break
+                        
+            else:
+                print("Unknown command")
+            
 class Instance:
 
     def __init__(self):
@@ -677,16 +866,18 @@ class PC1(Setup):
     ports = [25]
     name = "brobro"
     password = Computers.randromize(Computers,2,5)
+    LAN_net = None
     hard = 0.1
     def __init__(self):
-        self.LAN_net = None
-        self.hashes = "Administrator:" + str(hash(str(Login["172.435.211.10"][0])))
-        self.cl = ["ls",  "run", "mail", "web", "new", "help", "space", "connect","rm","cat","dis","download"]
+        self.getsys = [0,1,2,3]
+        self.uid = "NT/Authority System"
+        self.hashes = "Administrator:" + str(hash(self.password))
+        self.cl = ["ls", "getuid", "run", "mail", "web", "new", "help", "space", "connect","rm","cat","dis","download"]
         self.harddrive = ["explorer.shit","users.txt", "data.txt", "diction.txt"]
         self.messages = {"New":("Hey did you heard about that guy yesterday?", "")}
         self.txt = {"users.txt":"me, you, him, she, it", "data.txt":t2a("An0Nym0us:If you are done with the job just connect to the station(ip:95.126.234.24)"), "diction.txt":"wert, qwert, asfg, wqdasd, gwqer,12d, 13e 213e1d, 3241dsd3, r4dsxc32,d3dsad34,dsdd, 13szc,13sadsd, 2313dasd"}
         self.bash = "Han_Solo#> "
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.pspace = {"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
         self.space = 2048
         self.used = 30
         
@@ -695,16 +886,18 @@ class RE4(Setup):
     address = "173.545.23.4"
     ports = [80]
     name = "admin"
+    LAN_net = None
     password = Computers.randromize(Computers,4,6)
     hard = 0.3
     def __init__(self):
-        self.LAN_net = None
-        self.hashes = "Admin:" + str(hash(str(Login["173.545.23.4"][0])))
-        self.cl = ["ls",  "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
+        self.getsys = [0,1,2,3]
+        self.uid = "NT/Authority System"
+        self.hashes = "Admin:" + str(hash(self.password))
+        self.cl = ["ls", "getuid", "run", 1, "web", "new", "help", "space","cat","rm","dis","download"]
         self.harddrive = ["server.db", "index.html", "main.html", "color.dll", "download.html"]
         self.bash = "rootRE4#> "
         self.txt = {"download.html":"<!Doctype html>"}
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
+        self.pspace = {"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
         self.space = 4000
         self.used = 400
 
@@ -714,51 +907,60 @@ class Station1(Setup):
     lan_address = "192.168.1.3"
     ports = [445,21]
     name = "root"
+    vuls = ["net_api"]
     password = Computers.randromize(Computers,3,5)
     hard = 0.2
     def __init__(self):
-        self.LAN_net = [Mainframe1]
-        self.hashes = "User:" + str(hash(str(Login["95.126.234.24"][0])))
-        self.cl = ["ls",  "run","web", "new", "help", "space","cat","rm","dis","download"]
+        self.getsys = [2,3]
+        self.uid = "NT/Authority System"
+        self.hashes = "User:" + str(hash(self.password))
+        self.cl = ["ls", "mail", "run","web", "new", "getuid","help", "space","cat","rm","dis","download"]
         self.harddrive = ["yup.txt","explorer.exe", "File.txt"]
         self.bash = "ST1$root#> "
         self.txt = {"yup.txt":"Nope", "File.txt":"0101010101101010101011010101101101010"}
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
-        self.messages = {"Access":["Alright so this is your access","LAN_installer.exe"]}
+        self.pspace = {"msf.exe":200,"LAN_installer.exe":100,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
+        self.messages = {"Access":("Alright so this is your access.","LAN_installer.exe")}
         self.space = 4000
         self.used = 200
+    
 
 class Mainframe1(Setup):
     n = "4"
     address = "224.123.68.23"
     ports = [445]
     lan_address = "192.168.1.2"
+    LAN_net = [Station1]
     name = "main_root"
     password = Computers.randromize(Computers,8,10)
     hard = 1
     def __init__(self):
-        self.LAN_net = None
-        self.hashes = "Mainframe:" + str(hash(str(Login["95.126.234.24"][0])))
-        self.cl = ["ls",  "run","web", "new", "help", "space","cat","rm","dis","download"]
-        self.harddrive = ["yup.txt","explorer.exe", "File.txt"]
+        self.getsys = [1]
+        self.uid = "NT/Authority System"
+        self.hashes = "Mainframe:" + str(hash(self.password))
+        self.cl = ["ls",  "run","web", "new","getuid","mail", "help", "space","cat","rm","dis","download"]
+        self.harddrive = ["attack_list.txt","ddos.exe"]
         self.bash = "MAINFRAME#> "
-        self.txt = {"yup.txt":"Nope", "File.txt":"0101010101101010101011010101101101010"}
-        self.pspace = {"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7}
-        self.messages = {"Access":["Alright so this is your access","LAN_installer.exe"]}
-        self.space = 4000
-        self.used = 200
+        self.txt = {"attack_list.txt":"So after this thing settled we will attack the Votepad servers first one will be 145.79.243.84"}
+        self.pspace = {"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
+        self.messages = {"Attack1":["We are starting to attack RE4",""],"Attack1_rep1":["They have to strong defenses so will attack them with the secret weapon",""],"Attack1_rep2":["Target is down and we have the Decryptor :)",""],"Mistake":["I think a hacker recently got into RE4 servers. try to take him down",""]}
+        self.space = 8000
+        self.used = 1000
 
 
-                
+IPls = [PC1,RE4,Station1,Mainframe1]                
 i = Instance()
 s = Setup()
 pc = PC1()
 RE = RE4()
 st1 = Station1()
 m1 = Mainframe1()
-st1.LAN_net = [m1]
-m1.LAN_net = [st1]
+st1.LAN_net = [Mainframe1]
 
+def searchC(eq):
+    global IPls
+    for x in IPls:
+        if x.address == eq:
+            return x
 def Ncrack():
     letters = "abcdefghijklmnopqrstuvwxyz0123456789"
     while True:
@@ -860,3 +1062,7 @@ while True:
         RE.cl.append("LAN")
         st1.cl.append("LAN")
         m1.cl.append("LAN")
+        pc.cl.append("scan")
+        RE.cl.append("scan")
+        st1.cl.append("scan")
+        m1.cl.append("scan")

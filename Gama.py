@@ -6,6 +6,7 @@ import sys
 Login = None
 IP = None
 an_mes = "Hello"
+lock = True
 class SecondCounter(threading.Thread):
     
     def __init__(self, interval=0.1):
@@ -25,6 +26,7 @@ class SecondCounter(threading.Thread):
     def finish(self):
         self.alive = False
         return self.value
+    
 def getTerminalSize():
     import os
     env = os.environ
@@ -63,14 +65,8 @@ def box(text, space=False):
     while c < len(text):
         ch = text[c]
         part += ch      
-        if len(part) == hw-1:
-            if text[c+1:c+2] != " " and text[c:c+1] != " " and c != len(text)-1:
-                part += "-"
-            elif text[c:c+1] != " ":
-                part += " "
-                c += 1
-            elif not(space):
-                part += " "
+        if len(part) == hw:
+           
             if not(space):
                 part += "|"
             if c != len(text):
@@ -88,6 +84,7 @@ def box(text, space=False):
     if space:
         f += "\n"+ " "*(hw-1) + "|" + "_"*hw
     return f
+
 
 def t2a(text):
     chypher = ""
@@ -181,20 +178,24 @@ class Setup:
         return None
     
     def run(self, pr):
-        if len(pr) < 3:
-            print("Wrong syntax: run [program.extension]")
-        elif pr[::-1][:3] == "txt" or pr[::-1][:4] == "html":
-            print("Can't use run on non '.exe' files use 'cat' instead")
-            
-        elif pr in self.harddrive and pr[::-1][:3] == "exe":
-            if pr == "Ncrack.exe":
-                Ncrack()
-            else: 
-                a = pr[::-1][4:][::-1]
-                getattr(Setup, a)(self)
-            
+        fl = re.search(r"\[e\]",pr)
+        if fl != None:
+            print("File encrypted and cannot be opened")
         else:
-            print("Program not found or unable to run")
+            if len(pr) < 3:
+                print("Wrong syntax: run [program.extension]")
+            elif pr[::-1][:3] == "txt" or pr[::-1][:4] == "html":
+                print("Can't use run on non '.exe' files use 'cat' instead")
+                
+            elif pr in self.harddrive and pr[::-1][:3] == "exe":
+                if pr == "Ncrack.exe":
+                    Ncrack()
+                else: 
+                    a = pr[::-1][4:][::-1]
+                    getattr(Setup, a)(self)
+                
+            else:
+                print("Program not found or unable to run")
 
     def admin(self):
         self.harddrive.append("hashdump_install.exe")
@@ -210,6 +211,7 @@ class Setup:
         self.harddrive.append("LAN_installer.exe")
         self.harddrive.append("msf.exe")
         self.harddrive.append("hashcat.exe")
+        self.harddrive.append("tracer.exe")
         self.run("LAN_installer.exe")
         self.run("hashdump_install.exe")
         print("Hi shadow!")
@@ -339,9 +341,9 @@ class Setup:
                 if "attack_list.txt" in s.harddrive and s.mis3:
                      print("New message check mail!")
                      s.mis3 = False
-                     s.messages['Anonymous'][0].append(box("Nice job the attack_list shows their new target so try to hack in first plant the tracer.exe virus and run it on Votepad servers to trace this guys, and btw you can use hashcat to decrypt the hashes you got"))
+                     s.messages['Anonymous'][0].append(box("Nice job the attack_list shows their new target so try to hack in first install the tracer.exe virus and run it on Votepad servers to find this guys before they find you."))
                      s.messages['Anonymous'].append("tracer.exe")
-                     s.messages['Anonymous'].append("hashcat.exe")
+                     
 
         except IndexError:
             pass
@@ -736,7 +738,7 @@ class Setup:
                 for x in IPls:
                     if ip == x.address:
                         cmp = x
-                print(str(len(x.ports)) + " ports found")
+                print(str(len(x.ports)-1) + " ports found")
                 for y in cmp.ports:
                     if y == 25:
                           print("25 - Telnet port OPEN")
@@ -744,6 +746,8 @@ class Setup:
                         print("80 - Http port OPEN")
                     elif y == 445:
                         print("445 - SMB port OPEN")
+                    elif y == 2556:
+                        print("2556 - TCP/UDP port OPEN")
             except:
                 print("No such ip.")
         elif ent == 'e':
@@ -827,10 +831,12 @@ class Setup:
         else:
             print("File not found.")
         if file == "data.txt":
-            self.messages['Anonymous'][0].append(box("Ok, so just follow the trail in the file. btw install this new command from the attachment it's useful"))
+            self.messages['Anonymous'][0].append(box("Ok, so just follow the trail in the file. btw install this new command from the attachment it's useful for collecting hashes"))
             self.messages['Anonymous'].append("hashdump_install.exe")
             self.messages['Anonymous'][0].append(box("OK, so take this one it is used to exploit vulnarabilities in systems. Scan them first and then find a good exploit. Don't forget to use 'getsystem' to escalate privileges"))
             self.messages['Anonymous'].append("msf.exe")
+            self.messages['Anonymous'][0].append(box("Oh, and use this to decrypt the collected hashes"))
+            self.messages['Anonymous'].append("hashcat.exe")
             print("New messages!")
         print("Exiting..")
 
@@ -871,6 +877,7 @@ class Setup:
         ls = ["net_api","spoolss","net_identity","net_trojan","ms09_mail"]
         global IPls
         global IP
+        global OBJls
         while True:
             en = input("msfconsole{}#> ".format(exploit))
             comms = en.split(" ")
@@ -909,7 +916,7 @@ class Setup:
                     if x == "net_identity":
                         info = "finds the global ip addresses of device in the JUMP's LAN"
                     if x == "net_trojan":
-                        info = "opens a backdoor and attempts to spread through file-sharing networks.(attacks port 2556)"
+                        info = "uploads and runs file on vulnerable systems.(attacks port 2556)"
                     if x == "ms09_mail":
                         info = "attacks port 110(POP3) by sending emails with backdoor or system-scan virus"
                     print("'{}' - {}".format(x,info))
@@ -934,6 +941,7 @@ class Setup:
                     if ex == "net_trojan":
                         options["LHOST"] = "127.0.0.1"
                         options["RHOST"] = ""
+                        options["FILE"] = ""
                     if ex == "ms09_mail":
                         options["LHOST"] = "127.0.0.1"
                         options["RHOST"] = ""
@@ -947,6 +955,7 @@ class Setup:
                     print("{}: {}".format(x,options[x]))
                 if ex == "spoolss":
                     print("Can work also in HASH mode(uses hash username and decrypted password)")
+            
 
             elif en == "set":
                 if comms[0] in options.keys():
@@ -1017,6 +1026,18 @@ class Setup:
                         if y.lan_address == addr:
                             ip = y.address
                     print("Found global address of {} --> {}".format(addr,ip))
+                if ex == "net_trojan":
+                    file = options['FILE']
+                    for x in OBJls:
+                        if x.address == options['RHOST']:
+                            rhost = x
+                    if file in self.harddrive:
+                        print("Uploading file...")
+                        time.sleep(2)
+                        rhost.harddrive.append(file)
+                        print("File installed.")
+                    else:
+                        print("{} not in harddrive".format(file))
                     
 
             elif en == "e":
@@ -1145,21 +1166,46 @@ class Votepad(Setup):
     lan_address = "192.168.1.1"
     LAN_net = []
     name = "Pad"
-    password = Computers.randromize(Computers,7,15)
+    password = "*"
     hard = 1
     vuls = ["net_trojan"]
     def __init__(self):
         self.getsys = [1]
         self.uid = "NT/Authority System"
-        self.hashes = "Mainframe:" + str(hash(self.password))
+        self.hashes = "Vote:" + str(hash(self.password))
         self.cl = ["ls",  "run","web", "new","user","getuid","mail", "help", "space","cat","rm","dis","download"]
-        self.harddrive = ["attack_list.txt","ddos.exe"]
-        self.bash = "MAINFRAME#> "
-        self.txt = {"attack_list.txt":"So after this thing settled we will attack the Votepad servers first one will be 145.79.243.84"}
+        self.harddrive = ["master[e].exe","ddos.exe"]
+        self.bash = "Vote#> "
+        self.txt = {}
         self.pspace = {"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
-        self.messages = {"Attack1":["We are starting to attack RE4",""],"Attack1_rep1":["They have to strong defenses so will attack them with the secret weapon",""],"Attack1_rep2":["Target is down and we have the Decryptor :)",""],"Mistake":["I think a hacker recently got into RE4 servers. try to take him down",""]}
+        self.messages = {"AN0nIm0s":[[box("Give me the file now!"),box("Fuck off!!",True),box("OK, then >:)")],""]}
         self.space = 8000
         self.used = 1000
+
+class Omnis1(Setup):
+    n = "6"
+    address = "123.45.40.175"
+    ports = [445,25,24]
+    lan_address = "192.168.1.1"
+    LAN_net = []
+    name = "omsu458"
+    password = Computers.randromize(Computers,3,5)
+    hard = 1
+    vuls = ["net_api"]
+    def __init__(self):
+        self.getsys = [1]
+        self.uid = "NT/Authority System"
+        self.hashes = "Vote:" + str(hash(self.password))
+        self.cl = ["ls",  "run","web", "new","user","getuid","mail", "help", "space","cat","rm","dis","download"]
+        self.harddrive = []
+        self.bash = "Vote#> "
+        self.txt = {}
+        self.pspace = {"msf.exe":200,"LAN_installer.exe":160,"dict.txt":200,"data.txt":15,"Decryptor.exe":15,"Web_open.exe":2,"explorer.exe":20, "File.txt":10, "Ncrack.exe":10,"Port_scanner.exe":3,"Web_crawler.exe":7, "hashdump_install.exe":30}
+        self.messages = {"Mainframe":[[box("Ok i uploaded the file to the mainframe.",True),box("Good Job, now just wait until we get the decryptor.")],""]}
+        self.space = 8000
+        self.used = 1000
+
+
 
 
 print("Please, do not resize your window.")
@@ -1175,13 +1221,16 @@ ______          _           _     _____   ___  ___  ___  ___
              |__/                                              
    """)
 time.sleep(4)
-IPls = [PC1,RE4,Station1,Mainframe1]                
+IPls = [PC1,RE4,Station1,Mainframe1,Votepad,Omnis1]
 i = Instance()
 s = Setup()
 pc = PC1()
 RE = RE4()
 st1 = Station1()
 m1 = Mainframe1()
+v = Votepad()
+o1 = Omnis1()
+OBJls = [pc,RE,st1,m1,v,o1]
 Station1.LAN_net = [Mainframe1]
 def searchC(eq):
     global IPls
@@ -1230,6 +1279,10 @@ def Ncrack():
                     print("Connected.")
                     time.sleep(0.3)
                     print("Starting to crack using bruteforce on port " + p)
+                    if a.password == "*":
+                        time.sleep(4)
+                        print("password is changing and cannot be cracked.")
+                        break
                     word = ""
                     counter = 0
                     while word != a.password:
@@ -1268,6 +1321,14 @@ def Ncrack():
         elif ent == 'e':
             break
 while True:
+    if "tracer.exe" in v.harddrive and lock:
+        s.messages['tracer.exe(report)'] = [[],""]
+        s.messages['tracer.exe(report)'][0].append(box("Waiting for connection to current server..."))
+        s.messages['tracer.exe(report)'][0].append(box("User 123.45.40.175 connected to server."))
+        s.messages['tracer.exe(report)'][0].append(box("123.45.40.175 downloaded master[e].exe."))
+        s.messages['tracer.exe(report)'][0].append(box("123.45.40.175 deleted master[e].exe."))
+        print("Reports from tracer.exe recieved.\nCheck mail")
+        lock = False
     if i.me == "mine":
         enter = s.commands(input(s.bash))
     elif i.me == "1":
@@ -1278,11 +1339,15 @@ while True:
         enter = st1.commands(input(st1.bash))
     elif i.me == "4":
         enter = m1.commands(input(m1.bash))
+    elif i.me == "5":
+        enter = m1.commands(input(v.bash))
     if s.hash:
         pc.cl.append("hashdump")
         RE.cl.append("hashdump")
         st1.cl.append("hashdump")
         m1.cl.append("hashdump")
+        v.cl.append("hashdump")
+        o1.cl.append("hashdump")
     if s.LAN:
         pc.cl.append("LAN")
         RE.cl.append("LAN")
@@ -1292,3 +1357,5 @@ while True:
         RE.cl.append("scan")
         st1.cl.append("scan")
         m1.cl.append("scan")
+        v.cl.append("scan")
+        o1.cl.append("scan")

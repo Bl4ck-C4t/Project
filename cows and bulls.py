@@ -1,11 +1,17 @@
 import random
-num = random.randint(100,999)
-while len(str(num)) != len(set(str(num))):
-    num = random.randint(100,999)
+ln = int(input("Enter secret number's length: "))
+attempts = int(input("Enter attempts: "))
+rep = input("Do you want to have same digits in the secret number?(y/n): ")
+att = attempts
+n1 = 10*(ln-1)
+n2 = int("9"*ln)
+num = random.randint(n1,n2)
+if rep == "n":
+    while len(str(num)) != len(set(str(num))):
+        num = random.randint(n1,n2)
 print("The number is " + str(len(str(num))) + " digits long.")
 guess = ""
 nm = str(num)
-attempts = 8
 pl = True
 while guess != num:
     if attempts == 0:
@@ -41,7 +47,7 @@ else:
     else:
         player = "Player 2"
     print("The number was {}. {} won!!".format(num,player))
-    print("You won in {} attempts".format(8-attempts))
-    if 8 - attempts <= 4:
+    print("You won in {} attempts".format(att-attempts))
+    if att - attempts <= 4:
         print("Wow that luck/cheat brah!!!")
 

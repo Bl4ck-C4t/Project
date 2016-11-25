@@ -3,7 +3,7 @@ ln = int(input("Enter secret number's length: "))
 attempts = int(input("Enter attempts: "))
 rep = input("Do you want to have same digits in the secret number?(y/n): ")
 att = attempts
-n1 = 10*(ln-1)
+n1 = 10**(ln-1)
 n2 = int("9"*ln)
 num = random.randint(n1,n2)
 if rep == "n":
@@ -50,4 +50,4 @@ else:
     print("You won in {} attempts".format(att-attempts))
     if att - attempts <= 4:
         print("Wow that luck/cheat brah!!!")
-
+input("Press any key to exit...")

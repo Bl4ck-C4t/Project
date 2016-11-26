@@ -48,6 +48,8 @@ while point < len(info):
     elif x == "[":
         loop_start = point
         loop_end = info[point:].index("]")
+        if ind[curr] == 0:
+            point = loop_end
     elif x == "]":
         if ind[curr] != 0:
             point = loop_start

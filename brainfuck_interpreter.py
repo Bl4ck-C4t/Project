@@ -20,24 +20,24 @@ while point < len(info):
     x = info[point]
     if x == "+":
         ind[curr] += 1
-    if x == "-":
+    elif x == "-":
         ind[curr] -= 1
         if ind[curr] < 0:
             ind[curr] = 0
-    if x == ">":
+    elif x == ">":
         curr += 1
         try:
             ind[curr]
         except IndexError:
             ind.append(0)
-    if x == "<":
+    elif x == "<":
         curr -= 1
         if curr < 0:
             ind.insert(0,0)
             curr = 0
-    if x == ".":
+    elif x == ".":
         asd += chr(ind[curr])
-    if x == ",":
+    elif x == ",":
         if string == "":
             string = input()
         try:
@@ -45,13 +45,13 @@ while point < len(info):
         except:
             ind[curr] = 0
         str_ind += 1
-    if x == "[":
+    elif x == "[":
         loop_start = point
         loop_end = info[point:].index("]")
-    if x == "]":
+    elif x == "]":
         if ind[curr] != 0:
             point = loop_start
-    if x == "*":
+    elif x == "*":
         print(ind[curr])
     point += 1
 print(asd)

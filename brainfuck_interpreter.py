@@ -7,6 +7,7 @@ path = os.path.join(script_dir, path)
 f = open(path,"r+")
 info = f.read()
 f.close()
+info = "".join(info.split("\n"))
 ind = [0]
 curr = 0
 point = 0
@@ -14,6 +15,7 @@ string = ""
 str_ind = 0
 loop_start = 0
 loop_end = 0
+asd = ""
 while point < len(info):
     x = info[point]
     if x == "+":
@@ -34,7 +36,7 @@ while point < len(info):
             ind.insert(0,0)
             curr = 0
     if x == ".":
-        print(ord(ind[curr]))
+        asd += chr(ind[curr])
     if x == ",":
         if string == "":
             string = input()
@@ -46,12 +48,11 @@ while point < len(info):
     if x == "[":
         loop_start = point
         loop_end = info[point:].index("]")
-        if ind[curr] == 0:
-            point = loop_end
     if x == "]":
         if ind[curr] != 0:
             point = loop_start
     if x == "*":
         print(ind[curr])
     point += 1
+print(asd)
 print("DONE")

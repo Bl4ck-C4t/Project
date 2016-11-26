@@ -54,7 +54,7 @@ while point < len(info):
         if ind[curr] != 0:
             point = loop_start
     elif x == "*":
-        print(ind[curr])
+        asd += str(ind[curr])
     point += 1
 print(asd)
 print("DONE")

@@ -47,7 +47,7 @@ while point < len(info):
         str_ind += 1
     elif x == "[":
         loop_start = point
-        loop_end = info[point:].index("]")
+        loop_end = point+info[point:].index("]")
         if ind[curr] == 0:
             point = loop_end
     elif x == "]":
@@ -59,8 +59,8 @@ while point < len(info):
         ind[curr] = 0
     elif x == "(":
         clb = info[point:].index(")")
-        part = info[point+1:clb]
-        exp = re.search(r" *(-*\d+) *([><=]+) *(-*\d+): *(\d+) *\? *(\d+)",info)
+        part = info[point:clb+point]
+        exp = re.search(r" *(-*\d+) *([><=]+) *(-*\d+): *(\d+) *\? *(\d+)",part)
         cell1 = exp.group(1)
         sign = exp.group(2)
         cell2 = exp.group(3)

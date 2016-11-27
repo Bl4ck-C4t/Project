@@ -53,8 +53,28 @@ while point < len(info):
     elif x == "]":
         if ind[curr] != 0:
             point = loop_start
-    elif x == "*":
+    elif x == "/":
         asd += str(ind[curr])
+    elif x == "!":
+        ind[curr] = 0
+    elif x == "(":
+        clb = info[point:].index(")")
+        part = info[point+1:clb]
+        exp = re.search(r" *(-*\d+) *([><=]+) *(-*\d+): *(\d+) *\? *(\d+)",info)
+        cell1 = exp.group(1)
+        sign = exp.group(2)
+        cell2 = exp.group(3)
+        tr = exp.group(4)
+        fl = exp.group(5)
+        exp = str(ind[curr+int(cell1)]) + sign + str(ind[curr+int(cell2)])
+        exp = eval(exp)
+        if exp:
+            ind[curr] = int(tr)
+        else:
+            ind[curr] = int(fl)
+        point = clb
+    elif x == "*":
+        ind[curr] *= 2
     point += 1
 print(asd)
 print("DONE")

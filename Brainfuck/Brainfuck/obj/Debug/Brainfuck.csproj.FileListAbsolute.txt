@@ -1,0 +1,8 @@
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\bin\Debug\Brainfuck.exe.config
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\bin\Debug\Brainfuck.exe
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\bin\Debug\Brainfuck.pdb
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\obj\Debug\Brainfuck.Form1.resources
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\obj\Debug\Brainfuck.Properties.Resources.resources
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\obj\Debug\Brainfuck.csproj.GenerateResource.Cache
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\obj\Debug\Brainfuck.exe
+c:\users\user\documents\visual studio 2015\Projects\Brainfuck\Brainfuck\obj\Debug\Brainfuck.pdb

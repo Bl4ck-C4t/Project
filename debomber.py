@@ -1,11 +1,11 @@
 import glob
 from bin import *
-print("1.Key \n2.Begining \n3.Ending")
+print("1.Key \n2.Beginning \n3.Ending")
 select = input("Select option: ")
 if select == "1":
-    key  = int(input("Key: "))
+    key = int(input("Key: "))
     for x in glob.glob("*.txt"):
-        dechypher(x,key)
+        dechypher(x, key)
     print("Decrypted.")
 elif select == "2":
     ch1 = input("Type first characters of file: ")
@@ -45,7 +45,7 @@ elif select == "2":
     keys.reverse()
     if choice == "y":
         for x in glob.glob("*.txt"):
-            f = open(x,"w")
+            f = open(x, "w")
             f.truncate()
             f.write(check)
             f.close()

@@ -20,14 +20,14 @@ elif select == "2":
     keys = []
     while check[:len(ch1)] != ch1:
         part = check[:check[1:].index("$") + 1]
-        bi = b2i(part)
+        bi = s2i(part)
         c = ord(ch1[0])
         key = int(bi) - int(c)
         check = b2t(check, key)
         if check[:len(ch1)] != ch1:
             check = abc
             part = abc[::-1][1:][:abc[::-1][1:].index("$")][::-1]
-            bi = b2i(part)
+            bi = s2i(part)
             key = int(bi) - ord("$")
             keys.append(key)
             abc = b2t(abc, key)

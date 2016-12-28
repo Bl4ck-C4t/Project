@@ -1,78 +1,78 @@
+import re
+
 def b2i(binary):
-    num = str(binary)
-    ls = num
+    ls = str(binary)
     ls = ls[::-1]
     a = 0
     fn = 0
     for x in ls:
         if int(x) == 1:
             fn += pow(2, a)
-            a += 1
-        else:
-            a += 1
+        a += 1
     return str(fn)
 
+def i2h(integer):
+    return hex(integer)[2:]
 
-   
+def h2i(Hex):
+    Hex = Hex.upper()
+    Hex = Hex[::-1]
+    table = {"A":10, "B":11, "C":12, "D":13, "E":14, "F":15}
+    a = 0
+    fn = 0
+    for x in Hex:
+        if x in table.keys():
+            x = table[x]
+        else:
+            x = int(x)
+        fn += (16**a)*x
+        a += 1
+    return fn
+
 def i2b(integer):
-    num = str(integer)
-    nm = int(num)
-    fn = ""
-    while nm != 0:
-        if nm % 2 == 0:
-            fn = fn + "0"
-            nm = nm / 2
-            nm = int(nm)
-        else:
-            nm = nm / 2
-            nm = int(nm)
-            fn = fn + "1"
-    while len(fn) < 8:
-        fn += "0"
-    fn = fn[::-1]
-    return str(fn)
+    return bin(integer)[2:]
 
-def chypher(name, key):
+def chypher(name, key, Hex=False):
+    filename = name
+    f = open(filename, "r+")
+    info = f.read()
+    f = open(filename, "w")
+    if not Hex:
+        fn = t2b
+    else:
+        fn = t2h
+    f.write(fn(info, key))
+    f.close()
+
+def dechypher(name, key, Hex=False):
     filename = name
     f = open(filename, "r+")
     info = f.read()
     f = open(filename, "w")
     f.truncate()
-    f.write(te(info, key))
+    if not Hex:
+        fn = b2t
+    else:
+        fn = h2t
+    f.write(b2t(info, key))
     f.close()
-    print("File crypted.")
 
-def dechypher(name, key):
-    filename = name
-    f = open(filename, "r+")
-    info = f.read()
-    f = open(filename, "w")
-    f.truncate()
-    f.write(td(info, key))
-    f.close()
-    print("File decrypted.")
-
-def te(string, key):
+def t2b(string, key):
     enter = string
     fn = ""
     for x in enter:
-        y = ord(x) + key
-        y = i2b(y)
-        fn += y
-        fn += "$"
+        y = i2b(ord(x) + key)
+        fn += y + "$"
     return fn
 
-def td(binary, key):
-    enter = binary
-    mes = ""
-    part = ""
-    c = 0
-    while c < len(enter) - 1:
-        while enter[c] != "$":
-            part += enter[c]
-            c += 1
-        mes += chr(int(b2i(part)) - key)
-        c += 1
-        part = ""
-    return mes
+def b2t(binary, key):
+    return re.sub(r"(\d+)\$",lambda x: chr(int(b2i(x.group(1))) - key),binary)
 
+def t2h(string, key):
+    encrypted = ""
+    for x in string:
+        encrypted += i2h(ord(x) + key) + "$"
+    return encrypted
+
+def h2t(Hex, key):
+    return re.sub(r"(\w+)\$", lambda x: chr(h2i(x.group(1))- key), Hex)

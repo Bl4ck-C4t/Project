@@ -85,7 +85,7 @@ elif select == "2":
                 fn = ""
                 out = False
                 while True:
-                    print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols")
+                    print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols\n5. Custom character\n6. Range")
                     ch = input("Choose what to add('c' to cancel, 'f' to finish){}: ".format(ls))
                     if ch == "1":
                         fn += alpha
@@ -99,6 +99,27 @@ elif select == "2":
                     elif ch == "4":
                         fn += symbols
                         ls.append("Symbols")
+                    elif ch == "5":
+                        sym = input("Enter symbol: ")
+                        ls.append(sym)
+                        fn += sym
+                    elif ch == "6":
+                        print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols")
+                        char = input("Enter charset: ")
+                        if char == "1":
+                            char = alpha
+                        elif char == "2":
+                            char = alpha.upper()
+                        elif char == "3":
+                            char = numbers
+                        elif char == "4":
+                            char = symbols
+                        print(char)
+                        rng = input("Enter range: ")
+                        begin = char.index(rng[0])
+                        end = char.index(rng[2])
+                        fn += char[begin:end+1]
+                        ls.append(rng)
                     elif ch == "c":
                         break
                     elif ch == "f":
@@ -115,32 +136,35 @@ elif select == "2":
             state = False
             state2 = False
             while True:
-                if not state:
+                if not state and not vaild(check, alpha):
                     first_two = re.search(r"(\w+)\$(\w+)\$", check)
                     if first_two is None:
                         break
                     first = int(s2i(first_two.group(1)))
-                    second = int(s2i(first_two.group(2)))
                     key = first - ord(ch1[0])
                     try:
                         check = s2t(check, key)
-                    except ValueError:
+                    except (ValueError, OverflowError) as e:
                         state2 = True
                         break
                 if check[:len(ch1)] != ch1 or key < 0 or state:
                     if state:
                         state = False
                     check = abc
-                    last = s2i(re.search(r"(\w+)\$$", check).group(1))
+                    try:
+                        last = s2i(re.search(r"(\w+)\$$", check).group(1))
+                    except:
+                        break
                     last = int(last)
                     key = last - 36
                     keys.append(key)
                     try:
                         check = s2t(check, key)
+                        abc = check
                     except ValueError:
                         state2 = True
                         break
-                    abc = check
+
                 else:
                     print("Text found:\n{}".format(check))
                     print("Try: " + ch1)
@@ -173,8 +197,8 @@ elif select == "2":
                 continue
             ch = input("Would you like to write text to file?(y/n): ")
             if ch == "y":
-                for x in glob.glob("*.txt"):
-                    f = open(x, "w")
+                for y in files:
+                    f = open(y, "w")
                     f.write(check)
                     f.close()
                 print("Text written.")

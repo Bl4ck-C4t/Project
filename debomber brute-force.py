@@ -86,7 +86,7 @@ elif select == "2":
                 out = False
                 while True:
                     print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols\n5. Custom character\n6. Range\n"
-                          "7. Special")
+                          "7. Special\n8. Punctuation")
                     ch = input("Choose what to add('c' to cancel, 'f' to finish){}: ".format(ls))
                     if ch == "1":
                         fn += alpha
@@ -130,6 +130,8 @@ elif select == "2":
                         if ch == "2":
                             fn += "01"
                             ls.append("binary")
+                    elif ch == "8":
+                        fn += "!?.,()';:"
                     elif ch == "c":
                         break
                     elif ch == "f":

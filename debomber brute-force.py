@@ -132,6 +132,7 @@ elif select == "2":
                             ls.append("binary")
                     elif ch == "8":
                         fn += "!?.,()';:"
+                        ls.append("Punctuatuion")
                     elif ch == "c":
                         break
                     elif ch == "f":

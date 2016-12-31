@@ -85,7 +85,8 @@ elif select == "2":
                 fn = ""
                 out = False
                 while True:
-                    print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols\n5. Custom character\n6. Range")
+                    print("1. Lower alpha\n2. Upper alpha\n3. Numbers\n4. Symbols\n5. Custom character\n6. Range\n"
+                          "7. Special")
                     ch = input("Choose what to add('c' to cancel, 'f' to finish){}: ".format(ls))
                     if ch == "1":
                         fn += alpha
@@ -120,6 +121,15 @@ elif select == "2":
                         end = char.index(rng[2])
                         fn += char[begin:end+1]
                         ls.append(rng)
+                    elif ch == "7":
+                        print("1. Hex\n2. Binary")
+                        ch = input("Enter number of charset: ")
+                        if ch == "1":
+                            fn += "abcdef" + numbers
+                            ls.append("hex")
+                        if ch == "2":
+                            fn += "01"
+                            ls.append("binary")
                     elif ch == "c":
                         break
                     elif ch == "f":
@@ -135,19 +145,21 @@ elif select == "2":
             keys = []
             state = False
             state2 = False
+            jump = False
             while True:
-                if not state and not vaild(check, alpha):
+                if not state and not jump:
                     first_two = re.search(r"(\w+)\$(\w+)\$", check)
                     if first_two is None:
                         break
                     first = int(s2i(first_two.group(1)))
                     key = first - ord(ch1[0])
-                    try:
-                        check = s2t(check, key)
-                    except (ValueError, OverflowError) as e:
-                        state2 = True
-                        break
-                if check[:len(ch1)] != ch1 or key < 0 or state:
+                    if key > 0:
+                        try:
+                            check = s2t(check, key)
+                        except (ValueError, OverflowError) as e:
+                            state2 = True
+                            break
+                if (check[0] != ch1 or key < 0 or state) and not jump:
                     if state:
                         state = False
                     check = abc
@@ -157,15 +169,23 @@ elif select == "2":
                         break
                     last = int(last)
                     key = last - 36
-                    keys.append(key)
+                    if key > 0:
+                        keys.append(key)
+                    else:
+                        state2 = True
+                        break
                     try:
                         check = s2t(check, key)
                         abc = check
+                        if vaild(abc, alpha):
+                            jump = True
                     except ValueError:
                         state2 = True
                         break
 
                 else:
+                    if jump:
+                        jump = False
                     print("Text found:\n{}".format(check))
                     print("Try: " + ch1)
                     if check != start and check[0] == ch1[0] and vaild(check, alpha) and not state2:

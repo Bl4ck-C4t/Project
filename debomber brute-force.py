@@ -1,7 +1,6 @@
 import glob
 import re
 from bin import *
-
 # TODO debug with Asci art.txt
 
 
@@ -13,6 +12,11 @@ def vaild(word, alpha):
         if not(char in alpha):
             return False
     return True
+
+
+def write(file, txt):
+    with open(file, "w") as f:
+        f.write(txt)
 
 print("1. Binary\n2. Hex")
 ch = input("Chose Encryption method: ")
@@ -131,8 +135,8 @@ elif select == "2":
                             fn += "01"
                             ls.append("binary")
                     elif ch == "8":
-                        fn += "!?.,()';:"
-                        ls.append("Punctuatuion")
+                        fn += "!.,?():;'"
+                        ls.append("Punctuation")
                     elif ch == "c":
                         break
                     elif ch == "f":
@@ -154,7 +158,10 @@ elif select == "2":
                     first_two = re.search(r"(\w+)\$(\w+)\$", check)
                     if first_two is None:
                         break
-                    first = int(s2i(first_two.group(1)))
+                    try:
+                        first = int(s2i(first_two.group(1)))
+                    except:
+                        break
                     key = first - ord(ch1[0])
                     if key > 0:
                         try:
@@ -180,7 +187,7 @@ elif select == "2":
                     try:
                         check = s2t(check, key)
                         abc = check
-                        if vaild(abc, alpha):
+                        if vaild(abc, alpha) and Hex:
                             jump = True
                     except ValueError:
                         state2 = True
@@ -189,10 +196,16 @@ elif select == "2":
                 else:
                     if jump:
                         jump = False
-                    print("Text found:\n{}".format(check))
+                        """if check[0] != ch1[0]:
+                            state2 = True
+                            break"""
+                    print("Text found:\n{}".format(check[:400]))
                     print("Try: " + ch1)
                     if check != start and check[0] == ch1[0] and vaild(check, alpha) and not state2:
                         ch = input("Continue Decryption(y/n)?: ")
+                    elif check != start and check[0] != ch1[0] and vaild(check, alpha) and not state2:
+                        state2 = True
+                        break
                     else:
                         ch = "y"
                         state2 = False
@@ -209,7 +222,7 @@ elif select == "2":
                 ks += str(x) + ", "
             ks = ks[:-2]
             print("{} Keys found: {}".format(len(keys), ks))
-            print("Text found:\n{}".format(check))
+            print("Text found:\n{}".format(check[:400]))
             print("Try: " + ch1)
             if check != start and check[0] == ch1[0] and vaild(check, alpha) and not state2:
                 chose = input("Continue with next try?(y/n): ")

@@ -61,11 +61,13 @@ elif select == "2":
         with open(x, "r") as f:
             start = f.read()
         while True:
-            print("1. Lower-alpha\n2. Upper alpha\n3. Mixed alpha\n4. Symbolic\n5. Numeric\n6. Mixed\n7. Custom")
+            print("1. Lower-alpha\n2. Upper alpha\n3. Mixed alpha\n4. Symbolic\n5. Numeric\n6. Mixed\n7. Custom"
+                  "\n8. Text")
             ch = input("Choose alpha set: ")
             alpha = "abcdefghijklmnopqrstuvwxyz"
             symbols = " `'!@#$%^&*()-=_+<>?:;,./[]{}"
             numbers = "".join(str(x) for x in range(10))
+            punct = "!.,?():;'"
             if ch == "1":
                 pass
                 break
@@ -135,7 +137,7 @@ elif select == "2":
                             fn += "01"
                             ls.append("binary")
                     elif ch == "8":
-                        fn += "!.,?():;'"
+                        fn += punct
                         ls.append("Punctuation")
                     elif ch == "c":
                         break
@@ -145,6 +147,9 @@ elif select == "2":
                         break
                 if out:
                     break
+            elif ch == "8":
+                alpha = alpha.upper() + alpha  + punct
+                break
 
         for ch1 in alpha:
             abc = start

@@ -40,7 +40,7 @@ else:
     for x in glob.glob("*.txt"):
         print(x)
     files = [input("Enter filename: ")]
-print("1.Key\n2. Brute-force")
+print("1. Key\n2. Brute-force")
 select = input("Select option: ")
 if select == "1":
     key = int(input("Key: "))
@@ -165,10 +165,10 @@ elif select == "2":
                         break
                     try:
                         first = int(s2i(first_two.group(1)))
-                    except:
+                    except (TypeError, ValueError) as e:
                         break
                     key = first - ord(ch1[0])
-                    if key > 0:
+                    if key >= 0:
                         try:
                             check = s2t(check, key)
                         except (ValueError, OverflowError) as e:
@@ -180,7 +180,7 @@ elif select == "2":
                     check = abc
                     try:
                         last = s2i(re.search(r"(\w+)\$$", check).group(1))
-                    except:
+                    except (TypeError, ValueError) as e:
                         break
                     last = int(last)
                     key = last - 36
@@ -194,7 +194,7 @@ elif select == "2":
                         abc = check
                         if vaild(abc, alpha) and Hex:
                             jump = True
-                    except ValueError:
+                    except (TypeError, ValueError) as e:
                         state2 = True
                         break
 

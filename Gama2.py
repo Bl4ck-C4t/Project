@@ -380,7 +380,9 @@ def Decryptor(self):
         print("Goodbye")
 
 
-def LAN(host, rhost):
+def LAN(ls):
+    host = ls[0]
+    rhost = ls[1]
     ln = rhost.LAN
     print("Welcome to LAN tool")
     while True:
@@ -389,8 +391,9 @@ def LAN(host, rhost):
         if ent == "e":
             return
         elif ent == "s":
+            print("Computers connected to LAN:")
             for x in ln:
-                print("{} - {}".format(x.name, x.type))
+                print("{} - Lan state: {}".format(x.name, x.type))
         elif ent == "c":
             name = input("Enter name of computer on lan: ")
             lan_adp = search(ln, "name", name)
@@ -404,6 +407,7 @@ def LAN(host, rhost):
                 if user == lan_adp.user and password == lan_adp.password:
                     Instance.i = comp
                     print("Connected.")
+            return
 
 
 def hashdump(lhost, rhost):
@@ -487,7 +491,7 @@ class Instance:
 
 class PC:
     all_pc = []
-    story = 1  # shows to which part of the story we are
+
 
     def __init__(self, name, ip, me, space=1000, hard=[], mails=[]):
         self.ip = ip
@@ -512,7 +516,7 @@ class PC:
         self.mails = mails
         self.me = me
         self.space = space
-
+        self.story = 1  # shows to which part of the story we are
         self.ports = []
         self.all_pc.append(self)
 
@@ -551,14 +555,22 @@ class PC:
                                                      "find the mainframe.")])
             contact.attachments = [File.fls["LAN"]]
             print("New message.")
+        elif part == 6 and mess == "p6":
+            self.story += 1
+            add_email(contact, "Well done", [box("All right. Now just decrypt the file and follow the trail : )")])
+            print("New message.")
 
     def execute(self, command):
         command = command.split(" ")
         cmd = command[0]
         if cmd == "help":
-            print("'help' - to show this screen\n'ls' - to list files in current directory\n'connect' - to connect to"
+            print("'help' - to show this screen\n'ls' - to list files in current directory"
+                  "\n'mkdir [folder_name]' - to make a new folder\n'cd [path]' - to change current directory\n"
+                  "'mv [filename] [folder_path]' - to move a file to another folder\n'connect' - to connect to"
                   " another computer.\n'email' - to access emails\n'dis' - to disconnect from a computer\n"
-                  "'download' - to download files\n'space' - to see current memory\n'run' - to open a file")
+                  "'download' - to download files\n'space' - to see current memory\n'run' - to open a file\n"
+                  "'hrun' - to run files from your computer when connected to another"
+                  "\n'web [url]' - to go to a website")
 
         elif cmd == "admin":
             print("Welcome Shadow")
@@ -575,9 +587,9 @@ class PC:
             self.story = part
 
         elif cmd == "creds":
-            ls = [obj1]
+            ls = [obj1, obj3]
             for x in ls:
-                print("{} - ports: {}".format(x.ip, list(map(lambda y: y.number, x.ports))))
+                print("{} {} - ports: {}".format(x.name, x.ip, list(map(lambda y: y.number, x.ports))))
 
         elif cmd == "ls":
             for x in self.dir.folder:
@@ -656,6 +668,8 @@ class PC:
                             print("Server ip found: {}".format(obj2.ip))
                             if self.story == 4:
                                 self.reply(self.mails[0], "p4")
+            elif page == "www.metasploit.com":
+                pass  # download msf.exe
             else:
                 print("Unresolved web address. :/")
 
@@ -666,6 +680,18 @@ class PC:
                 print("No such file found.")
             else:
                 file.run(self)
+
+        elif cmd == "hrun":
+            host = Instance.host
+            print("Files on host:")
+            for x in host.dir.folder:
+                print(x.name)
+            file = input("Enter filename: ")
+            file = search(host.dir.folder, "name", file)
+            if file == False:
+                print("No such file found.")
+            else:
+                file.run([host, self])
 
         elif cmd == "space":
             print("Memory: {}/{}".format(self.used, self.space))
@@ -696,6 +722,14 @@ class PC:
                 self.bash = path + "#> "
                 self.path = path
                 self.dir = search(self.harddrive, "path", path)
+        elif cmd == "mv":
+            file = command[1]
+            folder = command[2]
+            file = search(self.dir.folder, "name", file)
+            folder = search(self.harddrive, "path", folder)
+            folder.folder.append(copy.deepcopy(file))
+            self.dir.folder.remove(file)
+            print("File moved to " + folder.path)
 
         elif cmd == "connect":
             ip = input("Enter ip to connect: ")
@@ -727,11 +761,14 @@ class PC:
                 if file == "c":
                     break
                 elif file == "d":
-                    my_pc = search(PC.all_pc, "me", True)
+                    my_pc = Instance.host
                     self.download(fls, my_pc)
                     if my_pc.story == 3:
                         contact = my_pc.mails[0]
                         my_pc.reply(contact, "p3")
+                    if my_pc.story == 6:
+                        contact = my_pc.mails[0]
+                        my_pc.reply(contact, "p6")
                     break
                 else:
                     file = search(self.dir.folder, "name", file, True)
@@ -778,6 +815,7 @@ File.fls["Decryptor"] = File("Decryptor", 60, "exe", Decryptor)
 File.fls["LAN"] = File("LAN_connect", 30, "exe", LAN)
 File.fls["ObjtxtFile1"] = File("data", 20, "txt", t2a("Some data"), True)
 File.fls["Dictionary"] = File("dict", 30, "txt", "pass1, pass2, pass3")
+File.fls["Link_to_msf"] = File("link", 30, "txt", t2a("The file is at: www.metasploit.com"), True)
 Port.ports.append(Port(25, 1))
 Port.ports.append(Port(80, 2))
 # Initializing other computers
@@ -788,14 +826,14 @@ obj2.ports.append(search(Port.ports, "number", 80, True))
 obj3 = PC("User", ipgen(), False, 600)  # first LAN
 obj3.ports.append(Port(25, 1))
 obj3.lan_conn = LAN_con(obj3)
-obj4 = PC("Retr0", ipgen(), False, 2000)  # has hashdump
+obj4 = PC("Retr0", ipgen(), False, 2000)  # middle
 obj4.lan_conn = LAN_con(obj4)
-obj5 = PC("Mainframe", ipgen(), False, 2000)  # has msfconsole
+obj5 = PC("Mainframe", ipgen(), False, 2000, [File.fls["Link_to_msf"]])  # has msfconsole 'end'
 obj5.ports.append(Port(40, 3, "closed"))
-obj5.lan_conn = LAN_con(obj5, "locked", credits(4, 1)[0], credits(1, 4)[1])
+obj5.lan_conn = LAN_con(obj5)
 obj3.LAN = [obj4.lan_conn]
-obj4.LAN = [obj5.lan_conn]
-obj5.LAN = [obj3.lan_conn, obj4.lan_conn]
+obj4.LAN = [obj3.lan_conn, obj5.lan_conn]
+obj5.LAN = [obj4.lan_conn]
 File.fls["ObjtxtFile1"].content = t2a("So the files are on: {}".format(obj3.ip))
 # head()
 name = input("Enter name: ")
@@ -805,6 +843,7 @@ player.mails.append(Contacts("Friend", [Contacts.Mail("Offer", [box("I am some o
 Instance.i = player
 Instance.host = search(PC.all_pc, "me", True)
 print("New emails check mailbox with 'email'")
+print("Use 'help' to see available commands")
 while True:
     inst = Instance.i
     inst.execute(input(inst.bash))
